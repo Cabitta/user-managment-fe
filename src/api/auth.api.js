@@ -17,6 +17,16 @@ export const register = async (userData) => {
   return data;
 };
 
+export const getMe = async () => {
+  const { data } = await api.get('/auth/me');
+  return data;
+};
+
+export const updateMe = async (payload) => {
+  const { data } = await api.put('/auth/me', payload);
+  return data;
+};
+
 export const logout = async () => {
   const { data } = await api.post('/auth/logout');
   return data;

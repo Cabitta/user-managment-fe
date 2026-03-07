@@ -34,19 +34,19 @@ Las rutas están protegidas según el rol. Un `user` que intente acceder a `/use
 
 ## Stack tecnológico
 
-| Categoría            | Tecnología              | Versión  |
-|----------------------|-------------------------|----------|
-| Librería UI          | React                   | 18       |
-| Build tool           | Vite                    | latest   |
-| Routing              | React Router            | v6       |
-| Estado global        | Zustand                 | latest   |
-| HTTP client          | Axios                   | latest   |
-| Estilos              | Tailwind CSS            | v3       |
-| Componentes UI       | shadcn/ui               | latest   |
-| Validación de forms  | React Hook Form         | latest   |
-| Debounce             | use-debounce            | latest   |
-| Modo oscuro          | next-themes             | latest   |
-| Lenguaje             | JavaScript ES6+         | —        |
+| Categoría           | Tecnología      | Versión |
+| ------------------- | --------------- | ------- |
+| Librería UI         | React           | 18      |
+| Build tool          | Vite            | latest  |
+| Routing             | React Router    | v6      |
+| Estado global       | Zustand         | latest  |
+| HTTP client         | Axios           | latest  |
+| Estilos             | Tailwind CSS    | v3      |
+| Componentes UI      | shadcn/ui       | latest  |
+| Validación de forms | React Hook Form | latest  |
+| Debounce            | use-debounce    | latest  |
+| Modo oscuro         | next-themes     | latest  |
+| Lenguaje            | JavaScript ES6+ | —       |
 
 ---
 
@@ -83,9 +83,9 @@ Crear un archivo `.env` en la raíz del proyecto basándose en `.env.example`:
 VITE_API_URL=http://localhost:3000/api
 ```
 
-| Variable        | Descripción                              | Ejemplo                          |
-|-----------------|------------------------------------------|----------------------------------|
-| `VITE_API_URL`  | URL base de la API REST del backend      | `http://localhost:3000/api`      |
+| Variable       | Descripción                         | Ejemplo                     |
+| -------------- | ----------------------------------- | --------------------------- |
+| `VITE_API_URL` | URL base de la API REST del backend | `http://localhost:3000/api` |
 
 > **Importante:** En Vite, todas las variables que empiezan con `VITE_` son accesibles en el cliente y quedan expuestas en el bundle final. No pongas secretos ni claves privadas en el `.env`.
 
@@ -148,14 +148,14 @@ user-management-client/
 
 ## Pantallas y rutas
 
-| Ruta           | Página              | Acceso              | Descripción                                                   |
-|----------------|---------------------|---------------------|---------------------------------------------------------------|
-| `/`            | Redirect            | Cualquiera          | Redirige según estado: `/login`, `/users` (admin) o `/profile` (user) |
-| `/login`       | `AuthPage`          | Solo no autenticado | Login y registro en una pantalla con toggle entre modos       |
-| `/users`       | `UsersPage`         | Solo `admin`        | Tabla paginada con buscador por nombre/email y todos los usuarios activos |
-| `/users/:id`   | `UserDetailPage`    | Solo `admin`        | Ver, editar y eliminar un usuario específico                  |
-| `/profile`     | `ProfilePage`       | Autenticado         | Ver y editar el perfil del usuario logueado                   |
-| `*`            | `NotFoundPage`      | Cualquiera          | Página 404 para rutas inexistentes                            |
+| Ruta         | Página           | Acceso              | Descripción                                                               |
+| ------------ | ---------------- | ------------------- | ------------------------------------------------------------------------- |
+| `/`          | Redirect         | Cualquiera          | Redirige según estado: `/login`, `/users` (admin) o `/profile` (user)     |
+| `/login`     | `AuthPage`       | Solo no autenticado | Login y registro en una pantalla con toggle entre modos                   |
+| `/users`     | `UsersPage`      | Solo `admin`        | Tabla paginada con buscador por nombre/email y todos los usuarios activos |
+| `/users/:id` | `UserDetailPage` | Solo `admin`        | Ver, editar y eliminar un usuario específico                              |
+| `/profile`   | `ProfilePage`    | Autenticado         | Ver y editar el perfil del usuario logueado                               |
+| `*`          | `NotFoundPage`   | Cualquiera          | Página 404 para rutas inexistentes                                        |
 
 ### Flujo de navegación por rol
 
@@ -184,12 +184,12 @@ Nunca se usa `axios` directamente en los componentes. Todas las llamadas pasan p
 
 ```javascript
 // ✅ Correcto
-import { getUsers } from '../api/users.api'
-const users = await getUsers({ page: 1, limit: 10 })
+import { getUsers } from "../api/users.api";
+const users = await getUsers({ page: 1, limit: 10 });
 
 // ❌ Incorrecto
-import axios from 'axios'
-const users = await axios.get('/api/users')
+import axios from "axios";
+const users = await axios.get("/api/users");
 ```
 
 Esto centraliza el manejo de errores, facilita cambiar la implementación y hace el código más legible.
@@ -253,6 +253,7 @@ docs:   cambios en documentación
 ```
 
 Ejemplos:
+
 ```bash
 git commit -m "feat: AuthPage login mode"
 git commit -m "chore: setup Tailwind and shadcn/ui"
@@ -265,6 +266,6 @@ git commit -m "fix: redirect loop on PublicOnlyRoute"
 
 Este frontend depende del backend para funcionar. El repositorio del backend con su propia documentación e instrucciones de instalación está en:
 
-👉 [user-management-api](https://github.com/tuusuario/user-management-api)
+👉 [user-management-be](https://github.com/Cabitta/user-managment-be)
 
 Asegurate de tenerlo corriendo antes de levantar el frontend en desarrollo.

@@ -25,20 +25,20 @@ Interfaz web que consume la API REST del administrador de usuarios. Permite a lo
 
 ## 2. Stack Técnico
 
-| Categoría            | Tecnología / Librería              | Propósito                                              |
-| -------------------- | ---------------------------------- | ------------------------------------------------------ |
-| Lenguaje             | JavaScript (ES6+)                  | Lenguaje principal                                     |
-| Librería UI          | React 18                           | Construcción de interfaces                             |
-| Build tool           | Vite                               | Bundler y servidor de desarrollo                       |
-| Routing              | React Router v6                    | Navegación entre pantallas                             |
-| Estado global        | Zustand                            | Usuario logueado y token JWT                           |
-| Llamadas a la API    | Axios                              | HTTP client con interceptores                          |
-| Estilos              | Tailwind CSS                       | Clases utilitarias                                     |
-| Componentes UI       | shadcn/ui                          | Componentes accesibles y customizables                 |
-| Validación forms     | React Hook Form                    | Manejo y validación de formularios                     |
-| Debounce             | use-debounce                       | Retraso en búsqueda para no saturar la API             |
-| Tema                 | Tailwind dark mode + `next-themes` | Toggle claro/oscuro con persistencia en `localStorage` |
-| Control de versiones | Git + GitHub                       | Historial de cambios y repositorio remoto              |
+| Categoría            | Tecnología / Librería              | Propósito                                                    |
+| -------------------- | ---------------------------------- | ------------------------------------------------------------ |
+| Lenguaje             | JavaScript (ES6+)                  | Lenguaje principal                                           |
+| Librería UI          | React 18                           | Construcción de interfaces                                   |
+| Build tool           | Vite                               | Bundler y servidor de desarrollo                             |
+| Routing              | React Router v6                    | Navegación entre pantallas                                   |
+| Estado global        | Zustand                            | Usuario logueado y token JWT                                 |
+| Llamadas a la API    | Axios                              | HTTP client con interceptores                                |
+| Estilos              | Tailwind CSS                       | Clases utilitarias                                           |
+| Componentes UI       | shadcn (latest CLI)                | Componentes accesibles y customizables (reemplaza shadcn-ui) |
+| Validación forms     | React Hook Form                    | Manejo y validación de formularios                           |
+| Debounce             | use-debounce                       | Retraso en búsqueda para no saturar la API                   |
+| Tema                 | Tailwind dark mode + `next-themes` | Toggle claro/oscuro con persistencia en `localStorage`       |
+| Control de versiones | Git + GitHub                       | Historial de cambios y repositorio remoto                    |
 
 ---
 
@@ -361,7 +361,7 @@ user-management-client/
 │   │   ├── auth.api.js       # Llamadas a /api/auth/*
 │   │   └── users.api.js      # Llamadas a /api/users/*
 │   ├── components/
-│   │   ├── ui/               # Componentes de shadcn/ui (auto-generados)
+│   │   ├── ui/               # Componentes de shadcn (auto-generados mediante CLI)
 │   │   └── shared/           # Componentes reutilizables propios (Navbar, Spinner, ThemeToggle, etc.)
 │   ├── pages/
 │   │   ├── AuthPage.jsx
@@ -395,7 +395,7 @@ El proyecto se construye en fases. **No se avanza a la siguiente fase hasta que 
 | Fase | Tarea                                                                                                                                                                                          | Entregable verificable                                                                                         |
 | ---- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
 | 1    | Crear repositorio en GitHub, `git init` local, primer commit con README y spec                                                                                                                 | Repositorio visible en GitHub                                                                                  |
-| 2    | Setup: `npm create vite`, instalar dependencias, configurar Tailwind, shadcn/ui y `next-themes`                                                                                                | App en blanco corre en `localhost:5173`, toggle claro/oscuro funciona, commit "chore: project setup"           |
+| 2    | Setup: `npm create vite`, instalar dependencias, configurar Tailwind, `shadcn` CLI y `next-themes`                                                                                             | App en blanco corre en `localhost:5173`, toggle claro/oscuro funciona, commit "chore: project setup"           |
 | 3    | Infraestructura base: React Router con páginas placeholder + Zustand store con persistencia + Axios con interceptores de request y response + `PrivateRoute`, `AdminRoute` y `PublicOnlyRoute` | Rutas protegidas redirigen correctamente, sesión persiste al recargar, interceptores funcionan, commit         |
 | 4    | `AuthPage` completa: modo Login, modo Registro con toggle, validaciones locales, confirmación de contraseña y manejo de errores de la API                                                      | Login y registro funcionan end-to-end, errores se muestran correctamente, commit                               |
 | 5    | `ProfilePage` completa: modo Vista + modo Edición + botón de logout                                                                                                                            | Ver y editar perfil propio funciona, logout limpia sesión y redirige, commit                                   |

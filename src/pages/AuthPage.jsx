@@ -4,11 +4,8 @@
  * Responsabilidad: Orquestar el flujo de autenticación.
  *
  * - UI: Usa Tabs de shadcn/ui para alternar modos.
- * - Form: Manejado con React Hook Form.
- * - Seguridad: Cumple con las reglas de validación del backend (spec 4.1).
- * - Errores:
- *   - Locales: debado de cada input (RHF errors).
- *   - Globales: encima del botón de submit (alert state).
+ * - Form: Manejado con React Hook Form (formularios independientes).
+ * - Seguridad: Mapeo preciso de la respuesta del backend (spec 4.1).
  */
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
@@ -24,7 +21,6 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -39,52 +35,70 @@ export default function AuthPage() {
   const [apiError, setApiError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("login");
+  const [successMessage, setSuccessMessage] = useState(null);
 
-  const {
-    register,
-    handleSubmit,
-    watch,
-    reset,
-    formState: { errors },
-  } = useForm({
-    mode: "onTouched",
-  });
+  const loginForm = useForm({ mode: "onTouched" });
+  const registerForm = useForm({ mode: "onTouched" });
 
-  // Resetear el formulario al cambiar de pestaña (spec 4.1)
   useEffect(() => {
-    reset();
     setApiError(null);
-  }, [activeTab, reset]);
+    setSuccessMessage(null);
+    loginForm.reset();
+    registerForm.reset();
+  }, [activeTab]);
 
-  const onSubmit = async (data) => {
+  const onLoginSubmit = async (data) => {
     setApiError(null);
     setIsLoading(true);
-
     try {
-      let response;
-      if (activeTab === "login") {
-        response = await loginService({
-          email: data.email,
-          password: data.password,
-        });
-      } else {
-        response = await registerService({
-          name: data.name,
-          email: data.email,
-          password: data.password,
-        });
-      }
+      const response = await loginService({
+        email: data.email,
+        password: data.password,
+      });
 
+      // El backend devuelve: { success: true, token: "...", data: { user_obj } }
       if (response.success) {
-        setSession(response.data.user, response.data.token);
-        // Redirección basada en rol
-        navigate(response.data.user.role === "admin" ? "/users" : "/profile");
+        setSession(response.data, response.token);
+        navigate(response.data.role === "admin" ? "/users" : "/profile");
       }
     } catch (error) {
-      // Manejo de error de API (spec 8 - Tipo 2)
+      console.error("Error en login:", error);
       const message =
         error.response?.data?.error?.message ||
-        "Error de conexión con el servidor";
+        "Error al iniciar sesión. Verificá tus credenciales.";
+      setApiError(message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const onRegisterSubmit = async (data) => {
+    setApiError(null);
+    setIsLoading(true);
+    try {
+      const response = await registerService({
+        name: data.name,
+        email: data.email,
+        password: data.password,
+      });
+
+      // El backend devuelve: { success: true, data: { user_obj } } -> SIN TOKEN
+      if (response.success) {
+        if (response.token) {
+          setSession(response.data, response.token);
+          navigate(response.data.role === "admin" ? "/users" : "/profile");
+        } else {
+          setSuccessMessage(
+            "¡Cuenta creada con éxito! Ahora podés iniciar sesión.",
+          );
+          setActiveTab("login");
+        }
+      }
+    } catch (error) {
+      console.error("Error en registro:", error);
+      const message =
+        error.response?.data?.error?.message ||
+        "Error al crear la cuenta. El email podría estar en uso.";
       setApiError(message);
     } finally {
       setIsLoading(false);
@@ -92,36 +106,41 @@ export default function AuthPage() {
   };
 
   return (
-    <div className="container relative min-h-screen flex-col items-center justify-center grid lg:max-w-none lg:grid-cols-1 lg:px-0">
+    <div className="container relative min-h-screen flex items-center justify-center p-4">
       <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[400px]">
-        <Tabs
-          defaultValue="login"
-          className="w-full"
-          onValueChange={setActiveTab}
-        >
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="login">Login</TabsTrigger>
             <TabsTrigger value="register">Registro</TabsTrigger>
           </TabsList>
 
-          {/* ----- MODO LOGIN ----- */}
           <TabsContent value="login">
             <Card>
               <CardHeader>
                 <CardTitle>Iniciar Sesión</CardTitle>
                 <CardDescription>
-                  Ingresá tus credenciales para acceder al sistema.
+                  Ingresá tus credenciales para continuar.
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                {successMessage && (
+                  <div className="mb-4 p-3 text-sm font-medium border border-green-500/50 bg-green-500/10 text-green-600 rounded-md">
+                    ✓ {successMessage}
+                  </div>
+                )}
+
+                <form
+                  onSubmit={loginForm.handleSubmit(onLoginSubmit)}
+                  className="space-y-4"
+                >
                   <div className="space-y-2">
                     <Label htmlFor="login-email">Email</Label>
                     <Input
                       id="login-email"
                       type="email"
+                      autoComplete="email"
                       placeholder="ana@ejemplo.com"
-                      {...register("email", {
+                      {...loginForm.register("email", {
                         required: "El email es requerido",
                         pattern: {
                           value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
@@ -129,9 +148,9 @@ export default function AuthPage() {
                         },
                       })}
                     />
-                    {errors.email && (
+                    {loginForm.formState.errors.email && (
                       <p className="text-sm font-medium text-destructive">
-                        {errors.email.message}
+                        {loginForm.formState.errors.email.message}
                       </p>
                     )}
                   </div>
@@ -140,13 +159,14 @@ export default function AuthPage() {
                     <Input
                       id="login-password"
                       type="password"
-                      {...register("password", {
+                      autoComplete="current-password"
+                      {...loginForm.register("password", {
                         required: "La contraseña es requerida",
                       })}
                     />
-                    {errors.password && (
+                    {loginForm.formState.errors.password && (
                       <p className="text-sm font-medium text-destructive">
-                        {errors.password.message}
+                        {loginForm.formState.errors.password.message}
                       </p>
                     )}
                   </div>
@@ -158,36 +178,39 @@ export default function AuthPage() {
                   )}
 
                   <Button type="submit" className="w-full" disabled={isLoading}>
-                    {isLoading ? "Cargando..." : "Iniciar sesión"}
+                    {isLoading ? "Enviando..." : "Iniciar sesión"}
                   </Button>
                 </form>
               </CardContent>
             </Card>
           </TabsContent>
 
-          {/* ----- MODO REGISTRO ----- */}
           <TabsContent value="register">
             <Card>
               <CardHeader>
                 <CardTitle>Nueva Cuenta</CardTitle>
                 <CardDescription>
-                  Completá los datos para registrarte.
+                  Completá tus datos para registrarte.
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                <form
+                  onSubmit={registerForm.handleSubmit(onRegisterSubmit)}
+                  className="space-y-4"
+                >
                   <div className="space-y-2">
                     <Label htmlFor="reg-name">Nombre completo</Label>
                     <Input
                       id="reg-name"
+                      autoComplete="name"
                       placeholder="Ana García"
-                      {...register("name", {
+                      {...registerForm.register("name", {
                         required: "El nombre es requerido",
                       })}
                     />
-                    {errors.name && (
+                    {registerForm.formState.errors.name && (
                       <p className="text-sm font-medium text-destructive">
-                        {errors.name.message}
+                        {registerForm.formState.errors.name.message}
                       </p>
                     )}
                   </div>
@@ -196,8 +219,9 @@ export default function AuthPage() {
                     <Input
                       id="reg-email"
                       type="email"
+                      autoComplete="email"
                       placeholder="ana@ejemplo.com"
-                      {...register("email", {
+                      {...registerForm.register("email", {
                         required: "El email es requerido",
                         pattern: {
                           value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
@@ -205,9 +229,9 @@ export default function AuthPage() {
                         },
                       })}
                     />
-                    {errors.email && (
+                    {registerForm.formState.errors.email && (
                       <p className="text-sm font-medium text-destructive">
-                        {errors.email.message}
+                        {registerForm.formState.errors.email.message}
                       </p>
                     )}
                   </div>
@@ -216,7 +240,8 @@ export default function AuthPage() {
                     <Input
                       id="reg-password"
                       type="password"
-                      {...register("password", {
+                      autoComplete="new-password"
+                      {...registerForm.register("password", {
                         required: "La contraseña es requerida",
                         minLength: { value: 8, message: "Mínimo 8 caracteres" },
                         validate: {
@@ -229,9 +254,9 @@ export default function AuthPage() {
                         },
                       })}
                     />
-                    {errors.password && (
+                    {registerForm.formState.errors.password && (
                       <p className="text-sm font-medium text-destructive">
-                        {errors.password.message}
+                        {registerForm.formState.errors.password.message}
                       </p>
                     )}
                   </div>
@@ -240,16 +265,17 @@ export default function AuthPage() {
                     <Input
                       id="reg-confirm"
                       type="password"
-                      {...register("confirmPassword", {
+                      autoComplete="new-password"
+                      {...registerForm.register("confirmPassword", {
                         required: "Debés confirmar la contraseña",
                         validate: (v) =>
-                          v === watch("password") ||
+                          v === registerForm.watch("password") ||
                           "Las contraseñas no coinciden",
                       })}
                     />
-                    {errors.confirmPassword && (
+                    {registerForm.formState.errors.confirmPassword && (
                       <p className="text-sm font-medium text-destructive">
-                        {errors.confirmPassword.message}
+                        {registerForm.formState.errors.confirmPassword.message}
                       </p>
                     )}
                   </div>
@@ -261,7 +287,7 @@ export default function AuthPage() {
                   )}
 
                   <Button type="submit" className="w-full" disabled={isLoading}>
-                    {isLoading ? "Cargando..." : "Crear cuenta"}
+                    {isLoading ? "Creando..." : "Crear cuenta"}
                   </Button>
                 </form>
               </CardContent>
