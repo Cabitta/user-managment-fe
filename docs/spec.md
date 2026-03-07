@@ -1,4 +1,5 @@
 # Spec — Frontend: Administrador de Usuarios
+
 **Versión:** 1.0  
 **Fecha:** 2026-03-06  
 **Metodología:** Spec-Driven Development (SDD)  
@@ -13,6 +14,7 @@ Interfaz web que consume la API REST del administrador de usuarios. Permite a lo
 **Objetivo principal:** Proveer una interfaz funcional, clara y bien organizada que refleje exactamente las capacidades y restricciones definidas en el spec del backend.
 
 **Alcance de esta versión (v1.0):**
+
 - Autenticación: login y registro en una sola pantalla con toggle
 - Panel de administración: lista de usuarios con paginación
 - Detalle de usuario: ver, editar y eliminar desde una misma pantalla
@@ -23,33 +25,33 @@ Interfaz web que consume la API REST del administrador de usuarios. Permite a lo
 
 ## 2. Stack Técnico
 
-| Categoría            | Tecnología / Librería | Propósito                                        |
-|----------------------|-----------------------|--------------------------------------------------|
-| Lenguaje             | JavaScript (ES6+)     | Lenguaje principal                               |
-| Librería UI          | React 18              | Construcción de interfaces                       |
-| Build tool           | Vite                  | Bundler y servidor de desarrollo                 |
-| Routing              | React Router v6       | Navegación entre pantallas                       |
-| Estado global        | Zustand               | Usuario logueado y token JWT                     |
-| Llamadas a la API    | Axios                 | HTTP client con interceptores                    |
-| Estilos              | Tailwind CSS          | Clases utilitarias                               |
-| Componentes UI       | shadcn/ui             | Componentes accesibles y customizables           |
-| Validación forms     | React Hook Form       | Manejo y validación de formularios               |
-| Debounce             | use-debounce          | Retraso en búsqueda para no saturar la API       |
+| Categoría            | Tecnología / Librería              | Propósito                                              |
+| -------------------- | ---------------------------------- | ------------------------------------------------------ |
+| Lenguaje             | JavaScript (ES6+)                  | Lenguaje principal                                     |
+| Librería UI          | React 18                           | Construcción de interfaces                             |
+| Build tool           | Vite                               | Bundler y servidor de desarrollo                       |
+| Routing              | React Router v6                    | Navegación entre pantallas                             |
+| Estado global        | Zustand                            | Usuario logueado y token JWT                           |
+| Llamadas a la API    | Axios                              | HTTP client con interceptores                          |
+| Estilos              | Tailwind CSS                       | Clases utilitarias                                     |
+| Componentes UI       | shadcn/ui                          | Componentes accesibles y customizables                 |
+| Validación forms     | React Hook Form                    | Manejo y validación de formularios                     |
+| Debounce             | use-debounce                       | Retraso en búsqueda para no saturar la API             |
 | Tema                 | Tailwind dark mode + `next-themes` | Toggle claro/oscuro con persistencia en `localStorage` |
-| Control de versiones | Git + GitHub          | Historial de cambios y repositorio remoto        |
+| Control de versiones | Git + GitHub                       | Historial de cambios y repositorio remoto              |
 
 ---
 
 ## 3. Pantallas y Rutas
 
-| Ruta               | Componente / Página   | Acceso              | Descripción                                  |
-|--------------------|-----------------------|---------------------|----------------------------------------------|
-| `/`                | Redirect              | Público             | Redirige a `/login` si no autenticado, a `/users` si admin, a `/profile` si user |
-| `/login`           | `AuthPage`            | Solo no autenticado | Login y registro en una sola pantalla con toggle |
-| `/users`           | `UsersPage`           | Solo `admin`        | Lista paginada de usuarios                   |
-| `/users/:id`       | `UserDetailPage`      | Solo `admin`        | Ver, editar y eliminar un usuario            |
-| `/profile`         | `ProfilePage`         | Autenticado         | Ver y editar perfil propio                   |
-| `*`                | `NotFoundPage`        | Cualquiera          | Página 404                                   |
+| Ruta         | Componente / Página | Acceso              | Descripción                                                                      |
+| ------------ | ------------------- | ------------------- | -------------------------------------------------------------------------------- |
+| `/`          | Redirect            | Público             | Redirige a `/login` si no autenticado, a `/users` si admin, a `/profile` si user |
+| `/login`     | `AuthPage`          | Solo no autenticado | Login y registro en una sola pantalla con toggle                                 |
+| `/users`     | `UsersPage`         | Solo `admin`        | Lista paginada de usuarios                                                       |
+| `/users/:id` | `UserDetailPage`    | Solo `admin`        | Ver, editar y eliminar un usuario                                                |
+| `/profile`   | `ProfilePage`       | Autenticado         | Ver y editar perfil propio                                                       |
+| `*`          | `NotFoundPage`      | Cualquiera          | Página 404                                                                       |
 
 ---
 
@@ -60,6 +62,7 @@ Interfaz web que consume la API REST del administrador de usuarios. Permite a lo
 Pantalla única con dos modos: **Login** y **Registro**, que se alternan con un toggle o tabs.
 
 **Modo Login:**
+
 - Campos: `email`, `password`
 - Botón: "Iniciar sesión"
 - Llama a: `POST /api/auth/login`
@@ -68,6 +71,7 @@ Pantalla única con dos modos: **Login** y **Registro**, que se alternan con un 
 - **Errores de la API** (credenciales incorrectas, usuario inactivo): se muestran como mensaje general encima del botón de submit.
 
 **Modo Registro:**
+
 - Campos: `name`, `email`, `password`, `confirmar password`
 - Botón: "Crear cuenta"
 - Llama a: `POST /api/auth/register`
@@ -81,6 +85,7 @@ Pantalla única con dos modos: **Login** y **Registro**, que se alternan con un 
 - **Errores de la API** (email ya registrado): mensaje general encima del botón de submit.
 
 **Comportamiento compartido:**
+
 - Si el usuario ya está autenticado y navega a `/login`, redirige automáticamente.
 - Al cambiar entre modo Login y Registro, el formulario se resetea completamente.
 
@@ -91,6 +96,7 @@ Pantalla única con dos modos: **Login** y **Registro**, que se alternan con un 
 Lista paginada de todos los usuarios activos. Solo accesible para `admin`.
 
 **Contenido:**
+
 - Barra de búsqueda: filtra por nombre o email llamando al backend con `?search=`
 - Tabla con columnas: `Nombre`, `Email`, `Rol`, `Fecha de creación`, `Acciones`
 - Columna Acciones: botón "Ver detalle" que navega a `/users/:id`
@@ -98,6 +104,7 @@ Lista paginada de todos los usuarios activos. Solo accesible para `admin`.
 - Indicador de total de usuarios y página actual
 
 **Comportamiento:**
+
 - Al cargar: llama a `GET /api/users?page=1&limit=10`
 - Al escribir en el buscador: llama a `GET /api/users?page=1&limit=10&search=<término>` con debounce de 400ms para no disparar un request por cada tecla
 - Al cambiar de página: mantiene el `search` activo si hay uno
@@ -111,12 +118,14 @@ Lista paginada de todos los usuarios activos. Solo accesible para `admin`.
 Pantalla única con tres modos: **Vista**, **Edición** y confirmación de **Eliminación**.
 
 **Modo Vista (default):**
+
 - Muestra: `nombre`, `email`, `rol`, `estado (activo/inactivo)`, `fecha de creación`, `fecha de actualización`
 - Botón "Editar" → activa modo edición
 - Botón "Eliminar" → abre modal de confirmación
 - Llama a: `GET /api/users/:id` al cargar
 
 **Modo Edición (activado con botón):**
+
 - Los campos `nombre`, `email`, `rol` se vuelven editables
 - Campo `password` opcional: si se deja vacío no se actualiza
 - Botón "Guardar cambios" → llama a `PUT /api/users/:id`
@@ -124,12 +133,14 @@ Pantalla única con tres modos: **Vista**, **Edición** y confirmación de **Eli
 - Al éxito: vuelve a modo Vista con datos actualizados
 
 **Modal de Eliminación:**
+
 - Mensaje de confirmación: "¿Estás seguro que querés desactivar a [nombre]? Esta acción no se puede deshacer."
 - Botón "Confirmar" → llama a `DELETE /api/users/:id`
 - Botón "Cancelar" → cierra el modal
 - Al éxito: redirige a `/users`
 
 **Reglas:**
+
 - Solo `admin` puede cambiar el campo `rol`
 - Un admin no puede eliminarse a sí mismo (botón "Eliminar" deshabilitado si el usuario es el mismo que está logueado)
 
@@ -140,11 +151,13 @@ Pantalla única con tres modos: **Vista**, **Edición** y confirmación de **Eli
 Pantalla del perfil propio. Misma lógica que `UserDetailPage` pero usa los endpoints `auth/me`.
 
 **Modo Vista (default):**
+
 - Muestra: `nombre`, `email`, `rol`, `fecha de creación`
 - Botón "Editar perfil" → activa modo edición
 - Llama a: `GET /api/auth/me` al cargar
 
 **Modo Edición:**
+
 - Campos editables: `nombre`, `email`, `password` (opcional)
 - Campo `rol` no editable (un usuario no puede cambiar su propio rol)
 - Botón "Guardar cambios" → llama a `PUT /api/auth/me`
@@ -152,6 +165,7 @@ Pantalla del perfil propio. Misma lógica que `UserDetailPage` pero usa los endp
 - Al éxito: actualiza el estado global de Zustand con los nuevos datos
 
 **Botón "Cerrar sesión":**
+
 - Llama a `POST /api/auth/logout`
 - Limpia el estado de Zustand
 - Redirige a `/login`
@@ -191,7 +205,7 @@ Se crea una instancia de Axios configurada con la URL base del backend. No se us
 ```javascript
 // src/api/axios.js
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL
+  baseURL: import.meta.env.VITE_API_URL,
 });
 ```
 
@@ -203,11 +217,13 @@ const api = axios.create({
 
 ## 7. Protección de Rutas
 
-Se implementan dos componentes de protección que envuelven las rutas:
+Se implementan componentes de protección utilizando el patrón de **Layout Routes** de React Router. Estos componentes actúan como "envoltorios" que verifican condiciones (token, rol) antes de renderizar sus rutas hijas mediante el componente `<Outlet />`.
 
-**`PrivateRoute`:** redirige a `/login` si el usuario no está autenticado.
+**`PrivateRoute`:** redirige a `/login` si el usuario no está autenticado (falta de token en el store).
 
-**`AdminRoute`:** redirige a `/profile` si el usuario está autenticado pero no es `admin`.
+**`AdminRoute`:** redirige a `/profile` si el usuario está autenticado pero no tiene el rol `admin`.
+
+**`PublicOnlyRoute`:** redirige a `/` si el usuario ya está autenticado, evitando que acceda a la pantalla de login/registro.
 
 ```
 /users       → AdminRoute  → PrivateRoute  → UsersPage
@@ -233,6 +249,7 @@ Son errores detectados **antes de llamar a la API**, directamente en el cliente.
 **Dónde se muestran:** debajo del campo correspondiente, en tiempo real mientras el usuario escribe o al intentar hacer submit.
 
 **Ejemplo visual:**
+
 ```
 [ ana@                        ]
   ⚠ Ingresá un email válido.
@@ -260,6 +277,7 @@ Son errores devueltos por el backend después de una llamada HTTP. El backend si
 **Dónde se muestran:** como mensaje general encima del botón de submit, usando el texto de `error.message` de la respuesta. No se asignan a ningún campo específico.
 
 **Ejemplo visual:**
+
 ```
 ┌─────────────────────────────────────────┐
 │ ⚠ El email ya está registrado.          │
@@ -270,15 +288,15 @@ Son errores devueltos por el backend después de una llamada HTTP. El backend si
 
 **Tabla de errores por código y mensaje mostrado al usuario:**
 
-| HTTP | `error.code`            | Mensaje mostrado en UI                              |
-|------|-------------------------|-----------------------------------------------------|
-| 400  | `VALIDATION_ERROR`      | Se usa `error.message` directo de la API            |
-| 401  | `UNAUTHORIZED`          | El interceptor redirige a `/login` automáticamente  |
-| 403  | `FORBIDDEN`             | "No tenés permisos para realizar esta acción."      |
-| 404  | `NOT_FOUND`             | "Usuario no encontrado."                            |
-| 409  | `CONFLICT`              | Se usa `error.message` directo de la API            |
-| 500  | `INTERNAL_SERVER_ERROR` | "Ocurrió un error inesperado. Intentá más tarde."   |
-| —    | Sin respuesta           | "No se pudo conectar con el servidor."              |
+| HTTP | `error.code`            | Mensaje mostrado en UI                             |
+| ---- | ----------------------- | -------------------------------------------------- |
+| 400  | `VALIDATION_ERROR`      | Se usa `error.message` directo de la API           |
+| 401  | `UNAUTHORIZED`          | El interceptor redirige a `/login` automáticamente |
+| 403  | `FORBIDDEN`             | "No tenés permisos para realizar esta acción."     |
+| 404  | `NOT_FOUND`             | "Usuario no encontrado."                           |
+| 409  | `CONFLICT`              | Se usa `error.message` directo de la API           |
+| 500  | `INTERNAL_SERVER_ERROR` | "Ocurrió un error inesperado. Intentá más tarde."  |
+| —    | Sin respuesta           | "No se pudo conectar con el servidor."             |
 
 > Para los códigos `400` y `409` se muestra el `error.message` de la API directamente porque el backend ya devuelve mensajes claros y accionables para el usuario ("El campo email es requerido.", "El email ya está registrado."). Para `500` se muestra un mensaje genérico porque el mensaje interno del servidor no es relevante para el usuario.
 
@@ -300,6 +318,7 @@ Un valor como `javascript:alert(1)` en un `href` es un vector XSS clásico. Si a
 
 **3. Mínima exposición de datos en el store**
 El objeto `user` en Zustand debe contener únicamente los campos necesarios para la UI:
+
 ```javascript
 // ✅ Correcto
 { _id, name, email, role }
@@ -322,6 +341,7 @@ Sin HTTPS, el token viaja en texto plano por la red. Las plataformas de deploy (
 ## 11. Variables de Entorno
 
 Archivo `.env.example`:
+
 ```
 VITE_API_URL=http://localhost:3000/api
 ```
@@ -372,19 +392,20 @@ user-management-client/
 
 El proyecto se construye en fases. **No se avanza a la siguiente fase hasta que la actual funciona correctamente.**
 
-| Fase | Tarea                                                                                                                                                                      | Entregable verificable                                                                                  |
-|------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------|
-| 1    | Crear repositorio en GitHub, `git init` local, primer commit con README y spec                                                                                             | Repositorio visible en GitHub                                                                           |
-| 2    | Setup: `npm create vite`, instalar dependencias, configurar Tailwind, shadcn/ui y `next-themes`                                                                            | App en blanco corre en `localhost:5173`, toggle claro/oscuro funciona, commit "chore: project setup"    |
-| 3    | Infraestructura base: React Router con páginas placeholder + Zustand store con persistencia + Axios con interceptores de request y response + `PrivateRoute`, `AdminRoute` y `PublicOnlyRoute` | Rutas protegidas redirigen correctamente, sesión persiste al recargar, interceptores funcionan, commit  |
-| 4    | `AuthPage` completa: modo Login, modo Registro con toggle, validaciones locales, confirmación de contraseña y manejo de errores de la API                                  | Login y registro funcionan end-to-end, errores se muestran correctamente, commit                        |
-| 5    | `ProfilePage` completa: modo Vista + modo Edición + botón de logout                                                                                                        | Ver y editar perfil propio funciona, logout limpia sesión y redirige, commit                            |
-| 6    | `UsersPage` completa: tabla paginada + buscador con debounce                                                                                                               | Lista usuarios con paginación y búsqueda funcionales, commit                                            |
-| 7    | `UserDetailPage` completa: modo Vista + modo Edición + modal de eliminación                                                                                                | Ver, editar y soft-delete de usuario funcionan correctamente, commit                                    |
-| 8    | Cierre: manejo de errores global en todas las pantallas + `NotFoundPage` + redirect en `/`                                                                                 | Todos los errores de la API se muestran en UI, rutas inválidas muestran 404, redirect inicial funciona, commit |
-| 9    | Pruebas manuales completas con el backend corriendo                                                                                                                        | Todos los flujos funcionan end-to-end                                                                   |
+| Fase | Tarea                                                                                                                                                                                          | Entregable verificable                                                                                         |
+| ---- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| 1    | Crear repositorio en GitHub, `git init` local, primer commit con README y spec                                                                                                                 | Repositorio visible en GitHub                                                                                  |
+| 2    | Setup: `npm create vite`, instalar dependencias, configurar Tailwind, shadcn/ui y `next-themes`                                                                                                | App en blanco corre en `localhost:5173`, toggle claro/oscuro funciona, commit "chore: project setup"           |
+| 3    | Infraestructura base: React Router con páginas placeholder + Zustand store con persistencia + Axios con interceptores de request y response + `PrivateRoute`, `AdminRoute` y `PublicOnlyRoute` | Rutas protegidas redirigen correctamente, sesión persiste al recargar, interceptores funcionan, commit         |
+| 4    | `AuthPage` completa: modo Login, modo Registro con toggle, validaciones locales, confirmación de contraseña y manejo de errores de la API                                                      | Login y registro funcionan end-to-end, errores se muestran correctamente, commit                               |
+| 5    | `ProfilePage` completa: modo Vista + modo Edición + botón de logout                                                                                                                            | Ver y editar perfil propio funciona, logout limpia sesión y redirige, commit                                   |
+| 6    | `UsersPage` completa: tabla paginada + buscador con debounce                                                                                                                                   | Lista usuarios con paginación y búsqueda funcionales, commit                                                   |
+| 7    | `UserDetailPage` completa: modo Vista + modo Edición + modal de eliminación                                                                                                                    | Ver, editar y soft-delete de usuario funcionan correctamente, commit                                           |
+| 8    | Cierre: manejo de errores global en todas las pantallas + `NotFoundPage` + redirect en `/`                                                                                                     | Todos los errores de la API se muestran en UI, rutas inválidas muestran 404, redirect inicial funciona, commit |
+| 9    | Pruebas manuales completas con el backend corriendo                                                                                                                                            | Todos los flujos funcionan end-to-end                                                                          |
 
 **Convención de commits:**
+
 - `feat:` — nueva pantalla o funcionalidad
 - `fix:` — corrección de bug
 - `chore:` — configuración, dependencias, setup
@@ -403,4 +424,4 @@ El proyecto se construye en fases. **No se avanza a la siguiente fase hasta que 
 
 ---
 
-*Documento generado como parte del proceso SDD. Ninguna línea de código se escribe antes de que este spec esté acordado.*
+_Documento generado como parte del proceso SDD. Ninguna línea de código se escribe antes de que este spec esté acordado._
