@@ -1,34 +1,69 @@
 /**
- * App.jsx — Componente raíz de la aplicación.
+ * App.jsx — Definición de rutas y navegación.
  *
- * Responsabilidad: En esta Fase 2 funciona como verificación del setup.
- * Muestra un ThemeToggle simple para confirmar que Tailwind dark mode
- * y next-themes funcionan correctamente antes de agregar el router.
- * En la Fase 3 este archivo será reemplazado por la definición de rutas.
+ * Responsabilidad: Orquestar el enrutamiento de la aplicación usando React Router.
+ * Define la estructura de rutas protegidas y públicas según el spec (sección 3 y 7).
+ *
+ * Estructura:
+ * /login     → Solo si no está logueado (PublicOnlyRoute)
+ * /profile   → Si está logueado (PrivateRoute)
+ * /users...  → Si es admin (AdminRoute + PrivateRoute)
+ * /          → Redirección inteligente
  */
-import { useTheme } from "next-themes";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { useAuthStore } from "./store/authStore";
 
-function ThemeToggle() {
-  const { theme, setTheme } = useTheme();
+// Páginas
+import AuthPage from "./pages/AuthPage";
+import UsersPage from "./pages/UsersPage";
+import UserDetailPage from "./pages/UserDetailPage";
+import ProfilePage from "./pages/ProfilePage";
+import NotFoundPage from "./pages/NotFoundPage";
 
-  return (
-    <button
-      onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-      className="px-4 py-2 rounded-md bg-primary text-primary-foreground hover:opacity-90 transition-opacity"
-    >
-      {theme === "dark" ? "☀️ Modo claro" : "🌙 Modo oscuro"}
-    </button>
+// Guards
+import PrivateRoute from "./routes/PrivateRoute";
+import AdminRoute from "./routes/AdminRoute";
+import PublicOnlyRoute from "./routes/PublicOnlyRoute";
+
+// Componente para el path "/" (Spec 3, Sección 47)
+function RootRedirect() {
+  const { user, token } = useAuthStore();
+
+  if (!token) return <Navigate to="/login" replace />;
+
+  return user?.role === "admin" ? (
+    <Navigate to="/users" replace />
+  ) : (
+    <Navigate to="/profile" replace />
   );
 }
 
-function App() {
+export default function App() {
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col items-center justify-center gap-6">
-      <h1 className="text-3xl font-bold">Administrador de Usuarios</h1>
-      <p className="text-muted-foreground">Fase 2 — Setup completado ✅</p>
-      <ThemeToggle />
-    </div>
+    <BrowserRouter>
+      <Routes>
+        {/* Ruta principal con redirect inteligente */}
+        <Route path="/" element={<RootRedirect />} />
+
+        {/* Rutas Públicas (solo accesibles si NO estás logueado) */}
+        <Route element={<PublicOnlyRoute />}>
+          <Route path="/login" element={<AuthPage />} />
+        </Route>
+
+        {/* Rutas Privadas (requieren autenticación) */}
+        <Route element={<PrivateRoute />}>
+          <Route path="/profile" element={<ProfilePage />} />
+
+          {/* Rutas de Administrador */}
+          <Route element={<AdminRoute />}>
+            <Route path="/users" element={<UsersPage />} />
+            <Route path="/users/:id" element={<UserDetailPage />} />
+          </Route>
+        </Route>
+
+        {/* Página 404 */}
+        <Route path="*" element={<NotFoundPage />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
-
-export default App;
