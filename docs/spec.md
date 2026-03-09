@@ -1,6 +1,6 @@
 # Spec — Frontend: Administrador de Usuarios
 
-**Versión:** 1.0  
+**Versión:** 1.1  
 **Fecha:** 2026-03-06  
 **Metodología:** Spec-Driven Development (SDD)  
 **Repositorio relacionado:** `user-management-api` (backend)
@@ -99,7 +99,7 @@ Lista paginada de todos los usuarios activos. Solo accesible para `admin`.
 
 - Barra de búsqueda: filtra por nombre o email llamando al backend con `?search=`
 - Tabla con columnas: `Nombre`, `Email`, `Rol`, `Fecha de creación`, `Acciones`
-- Columna Acciones: botón "Ver detalle" que navega a `/users/:id`
+- Columna Acciones: botones con iconos para "Ver detalle" (navega a `/users/:id`) e "Inactivar" (abre modal de confirmación)
 - Paginación: controles de siguiente/anterior y selector de página
 - Indicador de total de usuarios y página actual
 
@@ -119,7 +119,7 @@ Pantalla única con tres modos: **Vista**, **Edición** y confirmación de **Eli
 
 **Modo Vista (default):**
 
-- Muestra: `nombre`, `email`, `rol`, `estado (activo/inactivo)`, `fecha de creación`, `fecha de actualización`
+- Muestra: `ID`, `nombre`, `email`, `rol`, `estado (activo/inactivo)`, `fecha de creación`, `fecha de actualización`
 - Botón "Editar" → activa modo edición
 - Botón "Eliminar" → abre modal de confirmación
 - Llama a: `GET /api/users/:id` al cargar
@@ -152,7 +152,7 @@ Pantalla del perfil propio. Misma lógica que `UserDetailPage` pero usa los endp
 
 **Modo Vista (default):**
 
-- Muestra: `nombre`, `email`, `rol`, `fecha de creación`
+- Muestra: `ID`, `nombre`, `email`, `rol`, `fecha de creación`
 - Botón "Editar perfil" → activa modo edición
 - Llama a: `GET /api/auth/me` al cargar
 
@@ -353,7 +353,7 @@ En producción este valor cambia a la URL del backend desplegado.
 ## 12. Estructura de Carpetas
 
 ```
-user-management-client/
+user-managment-fe/
 ├── public/
 ├── src/
 │   ├── api/
@@ -410,6 +410,7 @@ El proyecto se construye en fases. **No se avanza a la siguiente fase hasta que 
 - `fix:` — corrección de bug
 - `chore:` — configuración, dependencias, setup
 - `style:` — cambios de estilos sin impacto funcional
+- `docs:` — cambios en documentación
 
 ---
 
