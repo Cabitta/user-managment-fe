@@ -1,7 +1,7 @@
 # Spec — Frontend: Administrador de Usuarios
 
-**Versión:** 1.1  
-**Fecha:** 2026-03-06  
+**Versión:** 1.2  
+**Fecha:** 2026-03-09  
 **Metodología:** Spec-Driven Development (SDD)  
 **Repositorio relacionado:** `user-management-api` (backend)
 
@@ -101,7 +101,7 @@ Lista paginada de todos los usuarios activos. Solo accesible para `admin`.
 - Tabla con columnas: `Nombre`, `Email`, `Rol`, `Fecha de creación`, `Acciones`
 - Columna Acciones: botones con iconos para "Ver detalle" (navega a `/users/:id`) e "Inactivar" (abre modal de confirmación)
 - Paginación: controles de siguiente/anterior y selector de página
-- Indicador de total de usuarios y página actual
+- Indicador de total de usuarios y página actual (el usuario administrador actualmente logueado se filtra de la lista para simplificar la gestión)
 
 **Comportamiento:**
 
@@ -135,8 +135,8 @@ Pantalla única con tres modos: **Vista**, **Edición** y confirmación de **Eli
 **Modal de Eliminación:**
 
 - Mensaje de confirmación: "¿Estás seguro que querés desactivar a [nombre]? Esta acción no se puede deshacer."
-- Botón "Confirmar" → llama a `DELETE /api/users/:id`
-- Botón "Cancelar" → cierra el modal
+- Botón "Confirmar" → llama a `DELETE /api/users/:id`. Cualquier error se muestra dentro del mismo modal (no se usan alerts del navegador).
+- Botón "Cancelar" → cierra el modal y resetea estados de error
 - Al éxito: redirige a `/users`
 
 **Reglas:**
@@ -166,9 +166,16 @@ Pantalla del perfil propio. Misma lógica que `UserDetailPage` pero usa los endp
 
 **Botón "Cerrar sesión":**
 
-- Llama a `POST /api/auth/logout`
+- Llama a `POST /api/auth/logout`. Cualquier error se muestra en la UI de forma integrada.
 - Limpia el estado de Zustand
 - Redirige a `/login`
+
+**Botón "Eliminar mi cuenta":**
+
+- Ubicado en la sección de detalles del perfil.
+- Abre un modal de confirmación con advertencia de cierre de sesión.
+- Llama a `DELETE /api/auth/me`.
+- Al éxito: limpia la sesión y redirige a `/login`.
 
 ---
 
