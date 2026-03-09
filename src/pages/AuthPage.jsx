@@ -15,6 +15,7 @@ import {
   login as loginService,
   register as registerService,
 } from "../api/auth.api";
+import { Eye, EyeOff } from "lucide-react";
 
 // UI Components (shadcn/ui)
 import {
@@ -36,6 +37,8 @@ export default function AuthPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("login");
   const [successMessage, setSuccessMessage] = useState(null);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const loginForm = useForm({ mode: "onTouched" });
   const registerForm = useForm({ mode: "onTouched" });
@@ -156,27 +159,40 @@ export default function AuthPage() {
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="login-password">Contraseña</Label>
-                    <Input
-                      id="login-password"
-                      type="password"
-                      autoComplete="current-password"
-                      {...loginForm.register("password", {
-                        required: "La contraseña es requerida",
-                      })}
-                    />
+                    <div className="relative">
+                      <Input
+                        id="login-password"
+                        type={showPassword ? "text" : "password"}
+                        autoComplete="current-password"
+                        {...loginForm.register("password", {
+                          required: "La contraseña es requerida",
+                        })}
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                        onClick={() => setShowPassword(!showPassword)}
+                      >
+                        {showPassword ? (
+                          <EyeOff className="h-4 w-4 text-muted-foreground" />
+                        ) : (
+                          <Eye className="h-4 w-4 text-muted-foreground" />
+                        )}
+                      </Button>
+                    </div>
                     {loginForm.formState.errors.password && (
                       <p className="text-sm font-medium text-destructive">
                         {loginForm.formState.errors.password.message}
                       </p>
                     )}
                   </div>
-
                   {apiError && (
                     <div className="p-3 text-sm font-medium border border-destructive/50 bg-destructive/10 text-destructive rounded-md">
                       ⚠ {apiError}
                     </div>
                   )}
-
                   <Button type="submit" className="w-full" disabled={isLoading}>
                     {isLoading ? "Enviando..." : "Iniciar sesión"}
                   </Button>
@@ -237,23 +253,41 @@ export default function AuthPage() {
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="reg-password">Contraseña</Label>
-                    <Input
-                      id="reg-password"
-                      type="password"
-                      autoComplete="new-password"
-                      {...registerForm.register("password", {
-                        required: "La contraseña es requerida",
-                        minLength: { value: 8, message: "Mínimo 8 caracteres" },
-                        validate: {
-                          hasUpper: (v) =>
-                            /[A-Z]/.test(v) || "Debe tener una mayúscula",
-                          hasLower: (v) =>
-                            /[a-z]/.test(v) || "Debe tener una minúscula",
-                          hasNumber: (v) =>
-                            /[0-9]/.test(v) || "Debe tener un número",
-                        },
-                      })}
-                    />
+                    <div className="relative">
+                      <Input
+                        id="reg-password"
+                        type={showPassword ? "text" : "password"}
+                        autoComplete="new-password"
+                        {...registerForm.register("password", {
+                          required: "La contraseña es requerida",
+                          minLength: {
+                            value: 8,
+                            message: "Mínimo 8 caracteres",
+                          },
+                          validate: {
+                            hasUpper: (v) =>
+                              /[A-Z]/.test(v) || "Debe tener una mayúscula",
+                            hasLower: (v) =>
+                              /[a-z]/.test(v) || "Debe tener una minúscula",
+                            hasNumber: (v) =>
+                              /[0-9]/.test(v) || "Debe tener un número",
+                          },
+                        })}
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                        onClick={() => setShowPassword(!showPassword)}
+                      >
+                        {showPassword ? (
+                          <EyeOff className="h-4 w-4 text-muted-foreground" />
+                        ) : (
+                          <Eye className="h-4 w-4 text-muted-foreground" />
+                        )}
+                      </Button>
+                    </div>
                     {registerForm.formState.errors.password && (
                       <p className="text-sm font-medium text-destructive">
                         {registerForm.formState.errors.password.message}
@@ -262,17 +296,34 @@ export default function AuthPage() {
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="reg-confirm">Confirmar contraseña</Label>
-                    <Input
-                      id="reg-confirm"
-                      type="password"
-                      autoComplete="new-password"
-                      {...registerForm.register("confirmPassword", {
-                        required: "Debés confirmar la contraseña",
-                        validate: (v) =>
-                          v === registerForm.watch("password") ||
-                          "Las contraseñas no coinciden",
-                      })}
-                    />
+                    <div className="relative">
+                      <Input
+                        id="reg-confirm"
+                        type={showConfirmPassword ? "text" : "password"}
+                        autoComplete="new-password"
+                        {...registerForm.register("confirmPassword", {
+                          required: "Debés confirmar la contraseña",
+                          validate: (v) =>
+                            v === registerForm.watch("password") ||
+                            "Las contraseñas no coinciden",
+                        })}
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                        onClick={() =>
+                          setShowConfirmPassword(!showConfirmPassword)
+                        }
+                      >
+                        {showConfirmPassword ? (
+                          <EyeOff className="h-4 w-4 text-muted-foreground" />
+                        ) : (
+                          <Eye className="h-4 w-4 text-muted-foreground" />
+                        )}
+                      </Button>
+                    </div>
                     {registerForm.formState.errors.confirmPassword && (
                       <p className="text-sm font-medium text-destructive">
                         {registerForm.formState.errors.confirmPassword.message}

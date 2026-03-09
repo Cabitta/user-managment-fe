@@ -11,6 +11,7 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useDebounce } from "use-debounce";
 import { getUsers, deleteUser } from "../api/users.api";
+import { useAuthStore } from "../store/authStore";
 
 // UI Components
 import {
@@ -34,6 +35,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   Search as SearchIcon,
   MoreHorizontal as MoreIcon,
@@ -44,6 +46,7 @@ import {
   ChevronRight as NextIcon,
   Loader2 as LoadingIcon,
   AlertCircle as ErrorIcon,
+  User as UserIcon,
 } from "lucide-react";
 
 export default function UsersPage() {
@@ -124,12 +127,13 @@ export default function UsersPage() {
             Gestioná los usuarios del sistema, sus roles y estados.
           </p>
         </div>
-        <Button asChild variant="outline" className="gap-2">
-          <Link to="/profile">
-            <EyeIcon className="h-4 w-4" />
-            Mi Perfil
-          </Link>
-        </Button>
+        <Link to="/profile">
+          <Avatar className="h-11 w-11 cursor-pointer border-2 border-primary/20 hover:border-primary transition-all shadow-sm">
+            <AvatarFallback className="bg-primary/5 text-primary">
+              <UserIcon className="h-6 w-6" />
+            </AvatarFallback>
+          </Avatar>
+        </Link>
       </div>
 
       {/* BARRA DE BÚSQUEDA */}
