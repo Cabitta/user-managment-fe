@@ -43,22 +43,6 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
-  Search,
-  MoreHorizontal,
-  Eye,
-  Trash2,
-  UserPlus,
-  ChevronLeft,
-  ChevronRight,
-  Loader2,
-  AlertCircle,
-} from "lucide-center"; // Note: Replaced with lucide-react in final implementation if needed
-
-// Corrected import
-import { LucideIcon } from "lucide-react";
-
-// Re-importing specific icons to be safe
-import {
   Search as SearchIcon,
   MoreHorizontal as MoreIcon,
   Eye as EyeIcon,
