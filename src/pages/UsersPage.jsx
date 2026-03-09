@@ -1,17 +1,12 @@
 /**
  * UsersPage.jsx — Panel de administración de usuarios.
- *
- * Responsabilidad:
- * - Listar todos los usuarios con paginación (Spec 3.2).
- * - Buscar por nombre/email con debounce.
- * - Realizar borrado lógico (soft-delete).
- * - Solo accesible para el rol 'admin'.
  */
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useDebounce } from "use-debounce";
 import { getUsers, deleteUser } from "../api/users.api";
 import { useAuthStore } from "../store/authStore";
+import { ThemeToggle } from "../components/shared/ThemeToggle";
 
 // UI Components
 import {
@@ -38,34 +33,32 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   Search as SearchIcon,
-  MoreHorizontal as MoreIcon,
   Eye as EyeIcon,
   Trash2 as TrashIcon,
-  UserPlus as AddIcon,
   ChevronLeft as PrevIcon,
   ChevronRight as NextIcon,
   Loader2 as LoadingIcon,
   AlertCircle as ErrorIcon,
   User as UserIcon,
+  Calendar as CalendarIcon,
 } from "lucide-react";
 
 export default function UsersPage() {
+  const currentUser = useAuthStore((state) => state.user);
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Filtros y Paginación
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearch] = useDebounce(searchTerm, 500);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalUsers, setTotalUsers] = useState(0);
 
-  // Estado para el modal de borrado
   const [userToDelete, setUserToDelete] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState(null);
 
-  // Carga de datos
   const fetchUsers = async () => {
     setLoading(true);
     setError(null);
@@ -77,9 +70,22 @@ export default function UsersPage() {
       });
 
       if (response.success) {
-        setUsers(response.data);
+        // Filtramos al usuario actual localmente
+        const filteredUsers = response.data.filter(
+          (u) => u._id !== currentUser?._id,
+        );
+        setUsers(filteredUsers);
         setTotalPages(response.pagination.totalPages);
-        setTotalUsers(response.pagination.total);
+
+        // Ajustamos el total mostrado si el usuario actual estaba en la respuesta
+        const wasCurrentUserInList = response.data.some(
+          (u) => u._id === currentUser?._id,
+        );
+        setTotalUsers(
+          wasCurrentUserInList
+            ? response.pagination.total - 1
+            : response.pagination.total,
+        );
       }
     } catch (err) {
       console.error("Error cargando usuarios:", err);
@@ -95,7 +101,6 @@ export default function UsersPage() {
     fetchUsers();
   }, [currentPage, debouncedSearch]);
 
-  // Resetear página al buscar
   useEffect(() => {
     setCurrentPage(1);
   }, [debouncedSearch]);
@@ -103,29 +108,42 @@ export default function UsersPage() {
   const handleDelete = async () => {
     if (!userToDelete) return;
     setIsDeleting(true);
+    setDeleteError(null);
     try {
       const response = await deleteUser(userToDelete._id);
       if (response.success) {
-        // Recargar la lista actual
         fetchUsers();
         setUserToDelete(null);
       }
     } catch (err) {
       console.error("Error al borrar usuario:", err);
-      alert("No se pudo desactivar el usuario.");
+      setDeleteError(
+        err.response?.data?.error?.message ||
+          "No se pudo desactivar el usuario.",
+      );
     } finally {
       setIsDeleting(false);
+    }
+  };
+
+  const handleCloseDeleteDialog = (open) => {
+    if (!open) {
+      setUserToDelete(null);
+      setDeleteError(null);
     }
   };
 
   return (
     <div className="container mx-auto py-10 px-4 space-y-6">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Usuarios</h1>
-          <p className="text-muted-foreground">
-            Gestioná los usuarios del sistema, sus roles y estados.
-          </p>
+        <div className="flex items-center gap-4">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">Usuarios</h1>
+            <p className="text-muted-foreground">
+              Gestioná los usuarios del sistema, sus roles y estados.
+            </p>
+          </div>
+          <ThemeToggle />
         </div>
         <Link to="/profile">
           <Avatar className="h-11 w-11 cursor-pointer border-2 border-primary/20 hover:border-primary transition-all shadow-sm">
@@ -136,7 +154,6 @@ export default function UsersPage() {
         </Link>
       </div>
 
-      {/* BARRA DE BÚSQUEDA */}
       <div className="flex items-center gap-2 max-w-sm">
         <div className="relative w-full">
           <SearchIcon className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -149,14 +166,14 @@ export default function UsersPage() {
         </div>
       </div>
 
-      {/* TABLA DE USUARIOS */}
       <div className="rounded-md border bg-card shadow-sm overflow-hidden">
         <Table>
           <TableHeader>
             <TableRow>
               <TableHead>Usuario</TableHead>
-              <TableHead>Email</TableHead>
+              <TableHead className="hidden md:table-cell">Email</TableHead>
               <TableHead>Rol</TableHead>
+              <TableHead className="hidden lg:table-cell">Creado</TableHead>
               <TableHead>Estado</TableHead>
               <TableHead className="text-center">Acciones</TableHead>
             </TableRow>
@@ -164,7 +181,7 @@ export default function UsersPage() {
           <TableBody>
             {loading ? (
               <TableRow>
-                <TableCell colSpan={5} className="h-48 text-center">
+                <TableCell colSpan={6} className="h-48 text-center">
                   <div className="flex flex-col items-center gap-2">
                     <LoadingIcon className="h-8 w-8 animate-spin text-primary" />
                     <p className="text-sm text-muted-foreground">
@@ -175,7 +192,7 @@ export default function UsersPage() {
               </TableRow>
             ) : error ? (
               <TableRow>
-                <TableCell colSpan={5} className="h-48 text-center">
+                <TableCell colSpan={6} className="h-48 text-center">
                   <div className="flex flex-col items-center gap-2 text-destructive">
                     <ErrorIcon className="h-8 w-8" />
                     <p className="font-medium">{error}</p>
@@ -192,7 +209,7 @@ export default function UsersPage() {
               </TableRow>
             ) : users.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={5} className="h-48 text-center">
+                <TableCell colSpan={6} className="h-48 text-center">
                   <p className="text-muted-foreground">
                     No se encontraron usuarios.
                   </p>
@@ -202,13 +219,21 @@ export default function UsersPage() {
               users.map((u) => (
                 <TableRow key={u._id}>
                   <TableCell className="font-medium">{u.name}</TableCell>
-                  <TableCell>{u.email}</TableCell>
+                  <TableCell className="hidden md:table-cell">
+                    {u.email}
+                  </TableCell>
                   <TableCell>
                     <Badge
                       variant={u.role === "admin" ? "default" : "secondary"}
                     >
                       {u.role.toUpperCase()}
                     </Badge>
+                  </TableCell>
+                  <TableCell className="hidden lg:table-cell text-muted-foreground text-xs">
+                    <div className="flex items-center gap-1">
+                      <CalendarIcon className="h-3 w-3" />
+                      {new Date(u.createdAt).toLocaleDateString("es-ES")}
+                    </div>
                   </TableCell>
                   <TableCell>
                     <Badge variant={u.isActive ? "outline" : "destructive"}>
@@ -247,11 +272,11 @@ export default function UsersPage() {
         </Table>
       </div>
 
-      {/* PAGINACIÓN */}
       {!loading && !error && users.length > 0 && (
         <div className="flex items-center justify-between">
           <p className="text-sm text-muted-foreground">
-            Mostrando {users.length} de {totalUsers} usuarios
+            Mostrando {users.length} de {totalUsers} usuarios (excluyendo tu
+            perfil)
           </p>
           <div className="flex items-center space-x-2">
             <Button
@@ -279,11 +304,7 @@ export default function UsersPage() {
         </div>
       )}
 
-      {/* MODAL DE CONFIRMACIÓN PARA BORRADO */}
-      <AlertDialog
-        open={!!userToDelete}
-        onOpenChange={(open) => !open && setUserToDelete(null)}
-      >
+      <AlertDialog open={!!userToDelete} onOpenChange={handleCloseDeleteDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>¿Estás seguro?</AlertDialogTitle>
@@ -293,6 +314,14 @@ export default function UsersPage() {
               hasta que un administrador lo reactive.
             </AlertDialogDescription>
           </AlertDialogHeader>
+
+          {deleteError && (
+            <div className="bg-destructive/15 text-destructive text-sm p-3 rounded-md border border-destructive/20 flex items-center gap-2">
+              <ErrorIcon className="h-4 w-4 shrink-0" />
+              <p>{deleteError}</p>
+            </div>
+          )}
+
           <AlertDialogFooter>
             <AlertDialogCancel disabled={isDeleting}>
               Cancelar

@@ -1,15 +1,12 @@
 /**
  * UserDetailPage.jsx — Detalle de usuario (Admin).
- *
- * Responsabilidad: Orquestar la vista, edición y desactivación de un usuario.
- * Sigue estrictamente la sección 4.3 del spec.
- * Estética unificada con ProfilePage (Header Resumen).
  */
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { getUserById, updateUserAdmin, deleteUser } from "@/api/users.api";
 import { useAuthStore } from "@/store/authStore";
+import { ThemeToggle } from "../components/shared/ThemeToggle";
 
 // UI Components
 import { Button } from "@/components/ui/button";
@@ -43,7 +40,6 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Separator } from "@/components/ui/separator";
 import {
   Loader2,
   ArrowLeft,
@@ -51,11 +47,11 @@ import {
   Trash2,
   Save,
   X,
-  User as UserIcon,
   Mail,
   Shield,
   Calendar,
   RefreshCw,
+  Hash,
 } from "lucide-react";
 
 export default function UserDetailPage() {
@@ -77,13 +73,11 @@ export default function UserDetailPage() {
     formState: { errors, isSubmitting, isDirty },
   } = useForm();
 
-  // Carga inicial del usuario
   const fetchUser = async () => {
     try {
       setLoading(true);
       const response = await getUserById(id);
       setUser(response.data);
-      // Pre-poblar el formulario
       reset({
         name: response.data.name,
         email: response.data.email,
@@ -102,17 +96,15 @@ export default function UserDetailPage() {
     fetchUser();
   }, [id]);
 
-  // Manejo de la edición
   const onUpdateUser = async (data) => {
     setApiError(null);
     try {
-      // Si el password está vacío, lo eliminamos del objeto para no enviarlo
       const updateData = { ...data };
       if (!updateData.password) delete updateData.password;
 
       await updateUserAdmin(id, updateData);
       setIsEditing(false);
-      fetchUser(); // Refrescar datos
+      fetchUser();
     } catch (err) {
       setApiError(
         err.response?.data?.error?.message || "Error al actualizar el usuario.",
@@ -120,7 +112,6 @@ export default function UserDetailPage() {
     }
   };
 
-  // Manejo del borrado (soft-delete)
   const onDeleteUser = async () => {
     try {
       await deleteUser(id);
@@ -133,7 +124,6 @@ export default function UserDetailPage() {
     }
   };
 
-  // Fallback para iniciales del Avatar
   const getInitials = (name) => {
     return (
       name
@@ -147,10 +137,10 @@ export default function UserDetailPage() {
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[400px]">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        <p className="mt-4 text-muted-foreground">
-          Cargando detalles del usuario...
+      <div className="flex flex-col items-center justify-center min-h-[400px] text-primary">
+        <Loader2 className="h-8 w-8 animate-spin" />
+        <p className="mt-4 text-sm text-muted-foreground font-medium">
+          Cargando perfil...
         </p>
       </div>
     );
@@ -182,109 +172,96 @@ export default function UserDetailPage() {
 
   return (
     <div className="container mx-auto py-10 px-4 space-y-6 max-w-4xl">
-      {/* BOTÓN VOLVER */}
-      <div className="flex justify-start">
-        <Button
-          variant="ghost"
-          onClick={() => navigate("/users")}
-          className="mb-2"
-        >
+      {/* Barra de navegación superior */}
+      <div className="flex justify-between items-center mb-2">
+        <Button variant="ghost" onClick={() => navigate("/users")}>
           <ArrowLeft className="mr-2 h-4 w-4" /> Volver a Usuarios
         </Button>
+        <ThemeToggle />
       </div>
 
-      {/* HEADER RESUMEN (Estilo ProfilePage) */}
-      <div className="flex flex-col md:flex-row items-center gap-6 p-6 bg-card border rounded-xl shadow-sm">
-        <Avatar className="h-24 w-24 border-2 border-primary/20">
-          <AvatarFallback className="text-2xl font-bold bg-primary/10 text-primary">
-            {getInitials(user?.name)}
-          </AvatarFallback>
-        </Avatar>
-        <div className="flex-1 text-center md:text-left space-y-2">
-          <div className="flex flex-col md:flex-row md:items-center gap-2 justify-center md:justify-start">
-            <h1 className="text-3xl font-bold tracking-tight">{user?.name}</h1>
-            <Badge variant={user?.isActive ? "default" : "destructive"}>
-              {user?.isActive ? "ACTIVO" : "INACTIVO"}
-            </Badge>
-            <Badge variant="outline" className="capitalize">
-              {user?.role}
-            </Badge>
-          </div>
-          <div className="flex items-center justify-center md:justify-start text-muted-foreground gap-2">
-            <Mail className="h-4 w-4" />
-            <span className="text-sm">{user?.email}</span>
-          </div>
-        </div>
+      <Card className="overflow-hidden shadow-md">
+        <CardHeader className="bg-muted/30 border-b pb-8">
+          <div className="flex flex-col md:flex-row items-center gap-6">
+            <Avatar className="h-24 w-24 border-4 border-background shadow-sm">
+              <AvatarFallback className="text-3xl font-bold bg-primary/10 text-primary">
+                {getInitials(user?.name)}
+              </AvatarFallback>
+            </Avatar>
+            <div className="flex-1 text-center md:text-left space-y-1.5">
+              <div className="flex flex-col md:flex-row md:items-center gap-2 justify-center md:justify-start">
+                <CardTitle className="text-3xl font-bold">
+                  {user?.name}
+                </CardTitle>
+                <div className="flex items-center gap-2 justify-center md:justify-start">
+                  <Badge variant={user?.isActive ? "default" : "destructive"}>
+                    {user?.isActive ? "ACTIVO" : "INACTIVO"}
+                  </Badge>
+                </div>
+              </div>
+              <CardDescription className="flex items-center justify-center md:justify-start gap-4 text-base">
+                <span className="flex items-center gap-1.5 text-foreground/80">
+                  <Mail className="h-4 w-4" />
+                  {user?.email}
+                </span>
+              </CardDescription>
+            </div>
 
-        {!isEditing && (
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              onClick={() => setIsEditing(true)}
-              size="sm"
-            >
-              <Edit2 className="mr-2 h-4 w-4" /> Editar
-            </Button>
-
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button variant="destructive" size="sm" disabled={isSelf}>
-                  <Trash2 className="mr-2 h-4 w-4" /> Eliminar
+            {!isEditing && (
+              <div className="flex gap-2 shrink-0">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setIsEditing(true)}
+                  className="bg-background"
+                >
+                  <Edit2 className="mr-2 h-4 w-4" /> Editar
                 </Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>¿Estás seguro?</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    Esta acción desactivará al usuario{" "}
-                    <strong>{user.name}</strong>. No podrá iniciar sesión hasta
-                    que un administrador lo reactive.
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                  <AlertDialogAction
-                    onClick={onDeleteUser}
-                    className="bg-destructive hover:bg-destructive/90 text-destructive-foreground"
-                  >
-                    Confirmar Eliminación
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
+
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button variant="destructive" size="sm" disabled={isSelf}>
+                      <Trash2 className="mr-2 h-4 w-4" /> Eliminar
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>¿Estás seguro?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Esta acción desactivará al usuario{" "}
+                        <strong>{user.name}</strong>. No podrá iniciar sesión
+                        hasta que un administrador lo reactive.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    {apiError && (
+                      <div className="bg-destructive/15 text-destructive text-sm p-3 rounded-md border border-destructive/20 flex items-center gap-2 my-2">
+                        <X className="h-4 w-4 shrink-0" />
+                        <p>{apiError}</p>
+                      </div>
+                    )}
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={onDeleteUser}
+                        className="bg-destructive hover:bg-destructive/90 text-destructive-foreground"
+                      >
+                        Confirmar Eliminación
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </div>
+            )}
           </div>
-        )}
-      </div>
-
-      <Separator />
-
-      {/* CONTENIDO PRINCIPAL / FORMULARIO */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <UserIcon className="h-5 w-5 text-primary" />
-            {isEditing ? "Editar Información" : "Información Detallada"}
-          </CardTitle>
-          <CardDescription>
-            {isEditing
-              ? "Modificá los datos del usuario. El rol y el email afectan el acceso al sistema."
-              : "Vista completa del registro del usuario en la base de datos."}
-          </CardDescription>
         </CardHeader>
 
-        <CardContent>
+        <CardContent className="pt-8 px-6 md:px-12">
           {isEditing ? (
             <form
               id="edit-user-form"
               onSubmit={handleSubmit(onUpdateUser)}
-              className="space-y-6"
+              className="space-y-6 max-w-2xl mx-auto"
             >
-              {apiError && (
-                <div className="bg-destructive/15 text-destructive text-sm p-3 rounded-md border border-destructive/20">
-                  ⚠ {apiError}
-                </div>
-              )}
-
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <Label htmlFor="name">Nombre Completo</Label>
@@ -363,74 +340,79 @@ export default function UserDetailPage() {
                   )}
                 </div>
               </div>
+
+              {apiError && (
+                <div className="bg-destructive/15 text-destructive text-sm p-3 rounded-md border border-destructive/20">
+                  ⚠ {apiError}
+                </div>
+              )}
             </form>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-y-8 gap-x-12">
-              <div className="flex items-start gap-3">
-                <div className="p-2 bg-primary/5 rounded-lg text-primary">
-                  <Shield className="h-5 w-5" />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-10 py-4">
+              <div className="flex flex-col gap-1.5">
+                <div className="flex items-center gap-2 text-primary font-semibold text-xs uppercase tracking-wider">
+                  <Hash className="h-4 w-4" />
+                  <span>ID de Usuario</span>
                 </div>
-                <div>
-                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                    ID Interno
-                  </p>
-                  <p className="font-mono text-sm mt-1">{user._id}</p>
-                </div>
+                <p className="font-mono text-sm break-all pt-1">{user?._id}</p>
+                <p className="text-xs text-muted-foreground italic">
+                  Identificador único del servidor
+                </p>
               </div>
 
-              <div className="flex items-start gap-3">
-                <div className="p-2 bg-primary/5 rounded-lg text-primary">
-                  <Shield className="h-5 w-5" />
+              <div className="flex flex-col gap-1.5">
+                <div className="flex items-center gap-2 text-primary font-semibold text-xs uppercase tracking-wider">
+                  <Shield className="h-4 w-4" />
+                  <span>Rol del Sistema</span>
                 </div>
-                <div>
-                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                    Permisos de Rol
-                  </p>
-                  <p className="font-medium mt-1 capitalize">{user.role}</p>
-                </div>
+                <p className="text-lg font-medium capitalize">
+                  {user?.role.toUpperCase()}
+                </p>
+                <p className="text-xs text-muted-foreground italic">
+                  Categoría de permisos
+                </p>
               </div>
 
-              <div className="flex items-start gap-3">
-                <div className="p-2 bg-primary/5 rounded-lg text-primary">
-                  <Calendar className="h-5 w-5" />
+              <div className="flex flex-col gap-1.5">
+                <div className="flex items-center gap-2 text-primary font-semibold text-xs uppercase tracking-wider">
+                  <Calendar className="h-4 w-4" />
+                  <span>Miembro desde</span>
                 </div>
-                <div>
-                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                    Miembro Desde
-                  </p>
-                  <p className="font-medium mt-1">
-                    {new Date(user.createdAt).toLocaleDateString("es-ES", {
-                      day: "numeric",
-                      month: "long",
-                      year: "numeric",
-                    })}
-                  </p>
-                </div>
+                <p className="text-lg font-medium">
+                  {new Date(user.createdAt).toLocaleDateString("es-ES", {
+                    day: "numeric",
+                    month: "long",
+                    year: "numeric",
+                  })}
+                </p>
+                <p className="text-xs text-muted-foreground italic">
+                  Fecha de registro en el sistema
+                </p>
               </div>
 
-              <div className="flex items-start gap-3">
-                <div className="p-2 bg-primary/5 rounded-lg text-primary">
-                  <RefreshCw className="h-5 w-5" />
+              <div className="flex flex-col gap-1.5">
+                <div className="flex items-center gap-2 text-primary font-semibold text-xs uppercase tracking-wider">
+                  <RefreshCw className="h-4 w-4" />
+                  <span>Último Cambio</span>
                 </div>
-                <div>
-                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                    Último Cambio
-                  </p>
-                  <p className="font-medium mt-1">
-                    {new Date(user.updatedAt).toLocaleDateString("es-ES", {
-                      day: "numeric",
-                      month: "long",
-                      year: "numeric",
-                    })}
-                    , {new Date(user.updatedAt).toLocaleTimeString()}
-                  </p>
-                </div>
+                <p className="text-lg font-medium">
+                  {new Date(user.updatedAt).toLocaleDateString("es-ES", {
+                    day: "numeric",
+                    month: "long",
+                    year: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
+                </p>
+                <p className="text-xs text-muted-foreground italic">
+                  Actualización automática
+                </p>
               </div>
             </div>
           )}
         </CardContent>
 
-        <CardFooter className="flex justify-end gap-3 border-t bg-muted/20 px-6 py-4">
+        <CardFooter className="flex justify-end gap-3 border-t bg-muted/10 px-6 py-4 mt-6">
           {isEditing ? (
             <>
               <Button
@@ -447,35 +429,36 @@ export default function UserDetailPage() {
                 form="edit-user-form"
                 type="submit"
                 disabled={isSubmitting || !isDirty}
+                className="gap-2"
               >
                 {isSubmitting ? (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  <Loader2 className="h-4 w-4 animate-spin" />
                 ) : (
-                  <Save className="mr-2 h-4 w-4" />
+                  <Save className="h-4 w-4" />
                 )}
                 Guardar Cambios
               </Button>
             </>
           ) : (
-            <p className="text-xs text-muted-foreground italic">
-              * Los datos mostrados arriba son la versión actual guardada en el
-              servidor.
-            </p>
+            <div className="w-full flex justify-between items-center text-xs text-muted-foreground italic font-medium">
+              <p>* Información administrativa oficial coordinada.</p>
+              <p>Estado Sincronizado ✓</p>
+            </div>
           )}
         </CardFooter>
       </Card>
 
       {isSelf && (
-        <div className="bg-blue-500/10 border border-blue-500/20 p-4 rounded-lg flex items-center gap-3">
+        <div className="bg-blue-500/10 border border-blue-500/20 p-4 rounded-lg flex items-center gap-3 animate-in fade-in duration-300">
           <Badge
             variant="outline"
             className="bg-blue-500/20 text-blue-700 dark:text-blue-400"
           >
             INFO
           </Badge>
-          <p className="text-sm text-blue-700 dark:text-blue-400">
-            Estás visualizando tu propio perfil administrativo. El botón de
-            eliminación ha sido deshabilitado por seguridad.
+          <p className="text-sm text-blue-700 dark:text-blue-400 font-medium">
+            Estás visualizando tu propio perfil administrativo. El borrado está
+            deshabilitado.
           </p>
         </div>
       )}

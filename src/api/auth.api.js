@@ -31,3 +31,8 @@ export const logout = async () => {
   const { data } = await api.post('/auth/logout');
   return data;
 };
+
+export const deleteMe = async () => {
+  const { data } = await api.delete('/auth/me');
+  return data;
+};
