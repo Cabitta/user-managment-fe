@@ -22,14 +22,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -132,10 +124,10 @@ export default function UsersPage() {
             Gestioná los usuarios del sistema, sus roles y estados.
           </p>
         </div>
-        <Button asChild className="gap-2">
-          <Link to="/register">
-            <AddIcon className="h-4 w-4" />
-            Nuevo Usuario
+        <Button asChild variant="outline" className="gap-2">
+          <Link to="/profile">
+            <EyeIcon className="h-4 w-4" />
+            Mi Perfil
           </Link>
         </Button>
       </div>
@@ -162,7 +154,7 @@ export default function UsersPage() {
               <TableHead>Email</TableHead>
               <TableHead>Rol</TableHead>
               <TableHead>Estado</TableHead>
-              <TableHead className="text-right">Acciones</TableHead>
+              <TableHead className="text-center">Acciones</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -219,33 +211,30 @@ export default function UsersPage() {
                       {u.isActive ? "ACTIVO" : "INACTIVO"}
                     </Badge>
                   </TableCell>
-                  <TableCell className="text-right">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                          <MoreIcon className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Acciones</DropdownMenuLabel>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem asChild>
-                          <Link
-                            to={`/users/${u._id}`}
-                            className="flex items-center gap-2 cursor-pointer"
-                          >
-                            <EyeIcon className="h-4 w-4" /> Ver detalle
-                          </Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          className="flex items-center gap-2 text-destructive focus:text-destructive cursor-pointer"
-                          disabled={!u.isActive}
-                          onClick={() => setUserToDelete(u)}
-                        >
-                          <TrashIcon className="h-4 w-4" /> Desactivar
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                  <TableCell>
+                    <div className="flex items-center justify-center gap-2">
+                      <Button
+                        asChild
+                        variant="outline"
+                        size="icon"
+                        className="h-8 w-8"
+                        title="Ver detalle"
+                      >
+                        <Link to={`/users/${u._id}`}>
+                          <EyeIcon className="h-4 w-4" />
+                        </Link>
+                      </Button>
+                      <Button
+                        variant="destructive"
+                        size="icon"
+                        className="h-8 w-8"
+                        disabled={!u.isActive}
+                        onClick={() => setUserToDelete(u)}
+                        title="Desactivar"
+                      >
+                        <TrashIcon className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))
