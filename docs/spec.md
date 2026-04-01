@@ -101,7 +101,7 @@ Lista paginada de todos los usuarios activos. Solo accesible para `admin`.
 - Tabla con columnas: `Nombre`, `Email`, `Rol`, `Fecha de creación`, `Acciones`
 - Columna Acciones: botones con iconos para "Ver detalle" (navega a `/users/:id`) e "Inactivar" (abre modal de confirmación)
 - Paginación: controles de siguiente/anterior y selector de página
-- Indicador de total de usuarios y página actual (el usuario administrador actualmente logueado se filtra de la lista para simplificar la gestión)
+- Indicador de total de usuarios y página actual
 
 **Comportamiento:**
 
