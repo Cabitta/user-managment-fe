@@ -70,22 +70,9 @@ export default function UsersPage() {
       });
 
       if (response.success) {
-        // Filtramos al usuario actual localmente
-        const filteredUsers = response.data.filter(
-          (u) => u._id !== currentUser?._id,
-        );
-        setUsers(filteredUsers);
+        setUsers(response.data);
         setTotalPages(response.pagination.totalPages);
-
-        // Ajustamos el total mostrado si el usuario actual estaba en la respuesta
-        const wasCurrentUserInList = response.data.some(
-          (u) => u._id === currentUser?._id,
-        );
-        setTotalUsers(
-          wasCurrentUserInList
-            ? response.pagination.total - 1
-            : response.pagination.total,
-        );
+        setTotalUsers(response.pagination.total);
       }
     } catch (err) {
       console.error("Error cargando usuarios:", err);
@@ -275,8 +262,7 @@ export default function UsersPage() {
       {!loading && !error && users.length > 0 && (
         <div className="flex items-center justify-between">
           <p className="text-sm text-muted-foreground">
-            Mostrando {users.length} de {totalUsers} usuarios (excluyendo tu
-            perfil)
+            Mostrando {users.length} de {totalUsers} usuarios
           </p>
           <div className="flex items-center space-x-2">
             <Button
