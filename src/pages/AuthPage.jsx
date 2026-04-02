@@ -15,6 +15,12 @@ import {
   login as loginService,
   register as registerService,
 } from "../api/auth.api";
+import { 
+  validateEmail,
+  validatePassword, 
+  validatePasswordMatch,
+  validateName
+} from "../lib/validations";
 import { Eye, EyeOff } from "lucide-react";
 
 // UI Components (shadcn/ui)
@@ -144,11 +150,7 @@ export default function AuthPage() {
                       autoComplete="email"
                       placeholder="ana@ejemplo.com"
                       {...loginForm.register("email", {
-                        required: "El email es requerido",
-                        pattern: {
-                          value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                          message: "Email inválido",
-                        },
+                        validate: validateEmail,
                       })}
                     />
                     {loginForm.formState.errors.email && (
@@ -165,7 +167,7 @@ export default function AuthPage() {
                         type={showPassword ? "text" : "password"}
                         autoComplete="current-password"
                         {...loginForm.register("password", {
-                          required: "La contraseña es requerida",
+                          validate: validatePassword,
                         })}
                       />
                       <Button
@@ -221,7 +223,7 @@ export default function AuthPage() {
                       autoComplete="name"
                       placeholder="Ana García"
                       {...registerForm.register("name", {
-                        required: "El nombre es requerido",
+                        validate: validateName,
                       })}
                     />
                     {registerForm.formState.errors.name && (
@@ -238,11 +240,7 @@ export default function AuthPage() {
                       autoComplete="email"
                       placeholder="ana@ejemplo.com"
                       {...registerForm.register("email", {
-                        required: "El email es requerido",
-                        pattern: {
-                          value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                          message: "Email inválido",
-                        },
+                        validate: validateEmail,
                       })}
                     />
                     {registerForm.formState.errors.email && (
@@ -259,19 +257,7 @@ export default function AuthPage() {
                         type={showPassword ? "text" : "password"}
                         autoComplete="new-password"
                         {...registerForm.register("password", {
-                          required: "La contraseña es requerida",
-                          minLength: {
-                            value: 8,
-                            message: "Mínimo 8 caracteres",
-                          },
-                          validate: {
-                            hasUpper: (v) =>
-                              /[A-Z]/.test(v) || "Debe tener una mayúscula",
-                            hasLower: (v) =>
-                              /[a-z]/.test(v) || "Debe tener una minúscula",
-                            hasNumber: (v) =>
-                              /[0-9]/.test(v) || "Debe tener un número",
-                          },
+                          validate: validatePassword,
                         })}
                       />
                       <Button
@@ -302,10 +288,7 @@ export default function AuthPage() {
                         type={showConfirmPassword ? "text" : "password"}
                         autoComplete="new-password"
                         {...registerForm.register("confirmPassword", {
-                          required: "Debés confirmar la contraseña",
-                          validate: (v) =>
-                            v === registerForm.watch("password") ||
-                            "Las contraseñas no coinciden",
+                          validate: (v) => validatePasswordMatch(registerForm.watch("password"), v),
                         })}
                       />
                       <Button
