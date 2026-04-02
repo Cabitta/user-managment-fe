@@ -1,7 +1,7 @@
 # Spec — Frontend: Administrador de Usuarios
 
-**Versión:** 1.2  
-**Fecha:** 2026-03-09  
+**Versión:** 1.4  
+**Fecha:** 2026-04-02  
 **Metodología:** Spec-Driven Development (SDD)  
 **Repositorio relacionado:** `user-management-api` (backend)
 
@@ -76,6 +76,7 @@ Pantalla única con dos modos: **Login** y **Registro**, que se alternan con un 
 - Botón: "Crear cuenta"
 - Llama a: `POST /api/auth/register`
 - Al éxito: hace login automático y redirige según rol
+- **Validación local del campo `name`**: Mínimo 2 y máximo 50 caracteres.
 - **Validaciones locales del campo `password`** (mismos requisitos que el backend):
   - Mínimo 8 caracteres
   - Al menos una letra mayúscula

@@ -154,6 +154,16 @@ Las funciones de validación de formularios se testean de forma **completamente 
 | 12   | ❌ Sad   | `"ana@"`           | Mensaje: email inválido     |
 | 13   | ❌ Sad   | `""`               | Mensaje: campo requerido    |
 
+### `validateName(name)`
+
+| Caso | Tipo     | Input               | Resultado esperado          |
+| ---- | -------- | ------------------- | --------------------------- |
+| 14   | ✅ Happy | `"Ana García"`      | `true`                      |
+| 15   | ✅ Happy | `"Al"`              | `true` (2 chars mín.)       |
+| 16   | ❌ Sad   | `"A"`               | Mensaje: mínimo 2 caracteres|
+| 17   | ❌ Sad   | `"a".repeat(51)`    | Mensaje: máximo 50 caracteres|
+| 18   | ❌ Sad   | `""`                | Mensaje: campo requerido    |
+
 ---
 
 ## 7. Tests de Componentes
@@ -279,7 +289,7 @@ Se testean solo los flujos más críticos. Los casos borde ya están cubiertos e
 
 | Suite              | Tests unitarios | Tests de componentes | Tests E2E | Total  |
 | ------------------ | --------------- | -------------------- | --------- | ------ |
-| Validaciones       | 13              | —                    | —         | 13     |
+| Validaciones       | 18              | —                    | —         | 18     |
 | PrivateRoute       | —               | 2                    | —         | 2      |
 | AdminRoute         | —               | 2                    | —         | 2      |
 | AuthPage           | —               | 17                   | —         | 17     |
