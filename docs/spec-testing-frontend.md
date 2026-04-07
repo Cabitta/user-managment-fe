@@ -142,27 +142,27 @@ Las funciones de validación de formularios se testean de forma **completamente 
 
 | Caso | Tipo     | Input                             | Resultado esperado         |
 | ---- | -------- | --------------------------------- | -------------------------- |
-| 8    | ✅ Happy | `"Password123"`, `"Password123"`  | `true`                     |
-| 9    | ❌ Sad   | `"Password123"`, `"Password456"`  | Mensaje: las contraseñas no coinciden |
-| 10   | ❌ Sad   | `"Password123"`, `""`             | Mensaje: campo requerido   |
+| 1    | ✅ Happy | `"Password123"`, `"Password123"`  | `true`                     |
+| 2    | ❌ Sad   | `"Password123"`, `"Password456"`  | Mensaje: las contraseñas no coinciden |
+| 3    | ❌ Sad   | `"Password123"`, `""`             | Mensaje: campo requerido   |
 
 ### `validateEmail(email)`
 
 | Caso | Tipo     | Input              | Resultado esperado          |
 | ---- | -------- | ------------------ | --------------------------- |
-| 11   | ✅ Happy | `"ana@example.com"`| `true`                      |
-| 12   | ❌ Sad   | `"ana@"`           | Mensaje: email inválido     |
-| 13   | ❌ Sad   | `""`               | Mensaje: campo requerido    |
+| 1    | ✅ Happy | `"ana@example.com"`| `true`                      |
+| 2    | ❌ Sad   | `"ana@"`           | Mensaje: email inválido     |
+| 3    | ❌ Sad   | `""`               | Mensaje: campo requerido    |
 
 ### `validateName(name)`
 
 | Caso | Tipo     | Input               | Resultado esperado          |
 | ---- | -------- | ------------------- | --------------------------- |
-| 14   | ✅ Happy | `"Ana García"`      | `true`                      |
-| 15   | ✅ Happy | `"Al"`              | `true` (2 chars mín.)       |
-| 16   | ❌ Sad   | `"A"`               | Mensaje: mínimo 2 caracteres|
-| 17   | ❌ Sad   | `"a".repeat(51)`    | Mensaje: máximo 50 caracteres|
-| 18   | ❌ Sad   | `""`                | Mensaje: campo requerido    |
+| 1    | ✅ Happy | `"Ana García"`      | `true`                      |
+| 2    | ✅ Happy | `"Al"`              | `true` (2 chars mín.)       |
+| 3    | ❌ Sad   | `"A"`               | Mensaje: mínimo 2 caracteres|
+| 4    | ❌ Sad   | `"a".repeat(51)`    | Mensaje: máximo 50 caracteres|
+| 5    | ❌ Sad   | `""`                | Mensaje: campo requerido    |
 
 ---
 
@@ -185,8 +185,8 @@ Los componentes se testean renderizándolos en un DOM simulado (jsdom). Las llam
 
 | Caso | Tipo     | Estado del store            | Resultado esperado              |
 | ---- | -------- | --------------------------- | ------------------------------- |
-| 3    | ✅ Happy | Usuario con `role: 'admin'` | Renderiza el componente hijo    |
-| 4    | ❌ Sad   | Usuario con `role: 'user'`  | Redirige a `/profile`           |
+| 1    | ✅ Happy | Usuario con `role: 'admin'` | Renderiza el componente hijo    |
+| 2    | ❌ Sad   | Usuario con `role: 'user'`  | Redirige a `/profile`           |
 
 ### 7.3 Componentes — AuthPage (17 tests)
 
@@ -209,35 +209,40 @@ Los componentes se testean renderizándolos en un DOM simulado (jsdom). Las llam
 
 | Caso | Tipo     | Acción / Input                          | Resultado esperado                                     |
 | ---- | -------- | --------------------------------------- | ------------------------------------------------------ |
-| 9    | ✅ Happy | Submit con datos válidos                | Llama a `POST /api/auth/register` y muestra éxito      |
-| 10   | ✅ Happy | Registro exitoso                        | Validación de flujo de navegación (Placeholder)        |
-| 11   | ❌ Sad   | Password menor a 8 caracteres           | Muestra error debajo del campo password                |
-| 12   | ❌ Sad   | Password sin mayúscula                  | Muestra error debajo del campo password                |
-| 13   | ❌ Sad   | Password sin número                     | Muestra error debajo del campo password                |
-| 14   | ❌ Sad   | Confirmar password no coincide          | Muestra error debajo del campo confirmar password      |
-| 15   | ❌ Sad   | API devuelve 409 (email duplicado)      | Muestra error de la API encima del botón               |
+| 1    | ✅ Happy | Submit con datos válidos                | Llama a `POST /api/auth/register` y muestra éxito      |
+| 2    | ✅ Happy | Registro exitoso                        | Validación de flujo de navegación (Placeholder)        |
+| 3    | ❌ Sad   | Password menor a 8 caracteres           | Muestra error debajo del campo password                |
+| 4    | ❌ Sad   | Password sin mayúscula                  | Muestra error debajo del campo password                |
+| 5    | ❌ Sad   | Password sin número                     | Muestra error debajo del campo password                |
+| 6    | ❌ Sad   | Confirmar password no coincide          | Muestra error debajo del campo confirmar password      |
+| 7    | ❌ Sad   | API devuelve 409 (email duplicado)      | Muestra error de la API encima del botón               |
 
 #### Comportamiento compartido (2 tests)
 
 | Caso | Tipo     | Acción                        | Resultado esperado                           |
 | ---- | -------- | ----------------------------- | -------------------------------------------- |
-| 16   | ✅ Happy | Click en toggle Login/Registro | Cambia el modo y resetea el formulario       |
-| 17   | ✅ Happy | Usuario ya logueado visita `/login` | Redirige automáticamente vía Guard     |
+| 1    | ✅ Happy | Click en toggle Login/Registro | Cambia el modo y resetea el formulario       |
+| 2    | ✅ Happy | Usuario ya logueado visita `/login` | Redirige automáticamente vía Guard     |
 
 ---
 
-### 7.4 UsersPage
+### 7.4 UsersPage (11 tests)
 
 **Archivo:** `tests/components/UsersPage.test.jsx`
 
 | Caso | Tipo     | Acción / Input                    | Resultado esperado                                    |
 | ---- | -------- | --------------------------------- | ----------------------------------------------------- |
-| 22   | ✅ Happy | Carga inicial                     | Llama a `GET /api/users?page=1&limit=10`, muestra tabla |
-| 23   | ✅ Happy | Escribe en buscador               | Llama a API con `?search=<término>` tras debounce     |
-| 24   | ✅ Happy | Cambia de página                  | Llama a API con `?page=N` manteniendo `search` activo |
-| 25   | ✅ Happy | Limpia el buscador                | Vuelve a llamar sin `?search`, desde página 1         |
-| 26   | ❌ Sad   | API devuelve lista vacía          | Muestra mensaje "No se encontraron usuarios"          |
-| 27   | ❌ Sad   | API devuelve error 500            | Muestra mensaje de error en la pantalla               |
+| 1    | ✅ Happy | Carga inicial                     | Llama a `GET /api/users?page=1&limit=10`, muestra tabla |
+| 2    | ✅ Happy | Escribe en buscador (Debounce)    | Llama a API con `?search=<término>` tras 500ms        |
+| 3    | ✅ Happy | Cambia de página                  | Llama a API con `?page=2`                             |
+| 4    | ✅ Happy | Limpia el buscador                | Vuelve a llamar sin `search`, reset a página 1       |
+| 5    | ❌ Sad   | API devuelve lista vacía          | Muestra mensaje "No se encontraron usuarios"          |
+| 6    | ❌ Sad   | API devuelve error 500            | Muestra mensaje de error en la pantalla               |
+| 7    | ❌ Sad   | Paginación en límites             | Botón "Anterior" disabled en p1 y "Siguiente" en p-last |
+| 8    | ✅ Happy | Persistencia de búsqueda          | Al cambiar página se mantiene el `search` en la URL   |
+| 9    | ✅ Happy | Reset de página al buscar         | Al escribir nuevo término, vuelve a `page=1`          |
+| 10   | ✅ Happy | Diálogo de confirmación           | Se abre el modal con el nombre del usuario            |
+| 11   | ✅ Happy | Desactivación exitosa             | Cierra modal y refresca la lista tras `DELETE`        |
 
 ---
 
@@ -267,10 +272,10 @@ Se testean solo los flujos más críticos. Los casos borde ya están cubiertos e
 
 | Caso | Tipo     | Flujo                                           | Resultado esperado                          |
 | ---- | -------- | ----------------------------------------------- | ------------------------------------------- |
-| 8    | ✅ Happy | Ver perfil propio                               | Muestra datos del usuario logueado          |
-| 9    | ✅ Happy | Editar nombre desde ProfilePage                 | Nombre actualizado visible en modo Vista    |
-| 10   | ✅ Happy | Cancelar edición                                | Vuelve a modo Vista sin cambios             |
-| 11   | ❌ Sad   | Intentar guardar nombre vacío                   | Muestra error de validación local           |
+| 1    | ✅ Happy | Ver perfil propio                               | Muestra datos del usuario logueado          |
+| 2    | ✅ Happy | Editar nombre desde ProfilePage                 | Nombre actualizado visible en modo Vista    |
+| 3    | ✅ Happy | Cancelar edición                                | Vuelve a modo Vista sin cambios             |
+| 4    | ❌ Sad   | Intentar guardar nombre vacío                   | Muestra error de validación local           |
 
 ### 8.3 Users flows (solo admin)
 
@@ -278,12 +283,12 @@ Se testean solo los flujos más críticos. Los casos borde ya están cubiertos e
 
 | Caso | Tipo     | Flujo                                           | Resultado esperado                               |
 | ---- | -------- | ----------------------------------------------- | ------------------------------------------------ |
-| 12   | ✅ Happy | Listar usuarios como admin                      | Tabla visible con paginación                     |
-| 13   | ✅ Happy | Buscar usuario por nombre                       | Tabla filtra resultados correctamente            |
-| 14   | ✅ Happy | Navegar al detalle de un usuario                | Muestra datos del usuario                        |
-| 15   | ✅ Happy | Editar nombre de un usuario                     | Nombre actualizado visible en modo Vista         |
-| 16   | ✅ Happy | Eliminar usuario (soft-delete)                  | Redirige a `/users`, usuario ya no aparece       |
-| 17   | ❌ Sad   | Intentar eliminar sin confirmar el modal        | Modal se cierra, usuario no se elimina           |
+| 1    | ✅ Happy | Listar usuarios como admin                      | Tabla visible con paginación                     |
+| 2    | ✅ Happy | Buscar usuario por nombre                       | Tabla filtra resultados correctamente            |
+| 3    | ✅ Happy | Navegar al detalle de un usuario                | Muestra datos del usuario                        |
+| 4    | ✅ Happy | Editar nombre de un usuario                     | Nombre actualizado visible en modo Vista         |
+| 5    | ✅ Happy | Eliminar usuario (soft-delete)                  | Redirige a `/users`, usuario ya no aparece       |
+| 6    | ❌ Sad   | Intentar eliminar sin confirmar el modal        | Modal se cierra, usuario no se elimina           |
 
 ---
 
@@ -295,11 +300,11 @@ Se testean solo los flujos más críticos. Los casos borde ya están cubiertos e
 | PrivateRoute       | —               | 2                    | —         | 2      |
 | AdminRoute         | —               | 2                    | —         | 2      |
 | AuthPage           | —               | 17                   | —         | 17     |
-| UsersPage          | —               | 6                    | —         | 6      |
+| UsersPage          | —               | 11                   | —         | 11     |
 | Auth E2E           | —               | —                    | 7         | 7      |
 | Profile E2E        | —               | —                    | 4         | 4      |
 | Users E2E          | —               | —                    | 6         | 6      |
-| **Total**          | **18**          | **27**               | **17**    | **62** |
+| **Total**          | **18**          | **32**               | **17**    | **67** |
 
 ---
 
@@ -328,7 +333,7 @@ Se testean solo los flujos más críticos. Los casos borde ya están cubiertos e
 | 3    | Tests unitarios de validaciones (18 tests)                                                     | 18 tests pasan, commit                              |
 | 4    | Tests de componentes de `PrivateRoute` y `AdminRoute` (4 tests)                                | 4 tests pasan, commit                               |
 | 5    | Tests de componentes de `AuthPage` (17 tests)                                                  | 17 tests pasan, commit                              |
-| 6    | Tests de componentes de `UsersPage` (6 tests)                                                  | 6 tests pasan, commit                               |
+| 6    | Tests de componentes de `UsersPage` (11 tests)                                                 | 11 tests pasan, commit                              |
 | 7    | Configurar coverage y verificar umbral del 80%                                                 | `npm run test:coverage` pasa sin errores, commit    |
 | 8    | Instalar y configurar Playwright                                                               | `npm run test:e2e` corre sin errores (0 tests)      |
 | 9    | Tests E2E de auth flows (7 tests)                                                              | 7 tests pasan con backend corriendo, commit         |
