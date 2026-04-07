@@ -38,7 +38,14 @@ import { Label } from "@/components/ui/label";
 
 export default function AuthPage() {
   const navigate = useNavigate();
-  const { setSession } = useAuthStore();
+  const { token, user, setSession } = useAuthStore();
+
+  // Redirigir automáticamente si ya hay una sesión activa
+  useEffect(() => {
+    if (token) {
+      navigate(user?.role === "admin" ? "/users" : "/profile");
+    }
+  }, [token, user, navigate]);
   const [apiError, setApiError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("login");
@@ -51,7 +58,6 @@ export default function AuthPage() {
 
   useEffect(() => {
     setApiError(null);
-    setSuccessMessage(null);
     loginForm.reset();
     registerForm.reset();
   }, [activeTab]);

@@ -32,7 +32,7 @@ export const createAdminData = (overrides = {}) => ({
  */
 export const createAuthResponse = (overrides = {}) => ({
   success: true,
-  user: createUserData(overrides.user || {}),
+  data: createUserData(overrides.user || overrides.data || {}),
   token: 'fake-jwt-token',
   ...overrides,
 });
