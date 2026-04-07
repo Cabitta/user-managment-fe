@@ -38,14 +38,7 @@ import { Label } from "@/components/ui/label";
 
 export default function AuthPage() {
   const navigate = useNavigate();
-  const { token, user, setSession } = useAuthStore();
-
-  // Redirigir automáticamente si ya hay una sesión activa
-  useEffect(() => {
-    if (token) {
-      navigate(user?.role === "admin" ? "/users" : "/profile");
-    }
-  }, [token, user, navigate]);
+  const { setSession } = useAuthStore();
   const [apiError, setApiError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("login");

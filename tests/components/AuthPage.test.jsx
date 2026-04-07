@@ -8,15 +8,26 @@
 import { describe, it, expect } from 'vitest';
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
+import { useAuthStore } from '../../src/store/authStore';
 import AuthPage from '../../src/pages/AuthPage';
+import PublicOnlyRoute from '../../src/routes/PublicOnlyRoute';
 import { renderWithProviders } from '../helpers/renderWithProviders';
 
 describe('AuthPage [Componente]', () => {
 
+  const RootRedirect = () => {
+    const { user, token } = useAuthStore();
+    if (!token) return <Navigate to="/login" replace />;
+    return <Navigate to={user?.role === 'admin' ? '/users' : '/profile'} replace />;
+  };
+
   const TestApp = () => (
     <Routes>
-      <Route path="/login" element={<AuthPage />} />
+      <Route path="/" element={<RootRedirect />} />
+      <Route element={<PublicOnlyRoute />}>
+        <Route path="/login" element={<AuthPage />} />
+      </Route>
       <Route path="/users" element={<div>Panel de Administración</div>} />
       <Route path="/profile" element={<div>Perfil de Usuario</div>} />
     </Routes>
