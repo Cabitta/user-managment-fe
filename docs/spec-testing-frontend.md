@@ -1,7 +1,7 @@
 # Spec — Testing: Frontend
 
-**Versión:** 1.0
-**Fecha:** 2026-03-31
+**Versión:** 1.5
+**Fecha:** 2026-04-07
 **Metodología:** Spec-Driven Development (SDD)
 **Repositorio:** `user-management-client`
 **Referencia:** `docs/spec-frontend.md`
@@ -188,41 +188,43 @@ Los componentes se testean renderizándolos en un DOM simulado (jsdom). Las llam
 | 3    | ✅ Happy | Usuario con `role: 'admin'` | Renderiza el componente hijo    |
 | 4    | ❌ Sad   | Usuario con `role: 'user'`  | Redirige a `/profile`           |
 
-### 7.3 AuthPage
+### 7.3 Componentes — AuthPage (17 tests)
 
 **Archivo:** `tests/components/AuthPage.test.jsx`
 
-#### Modo Login
+#### Modo Login (8 tests)
 
 | Caso | Tipo     | Acción / Input                        | Resultado esperado                                        |
 | ---- | -------- | ------------------------------------- | --------------------------------------------------------- |
-| 5    | ✅ Happy | Submit con credenciales válidas       | Llama a `POST /api/auth/login`, guarda sesión en store    |
-| 6    | ✅ Happy | Login admin exitoso                   | Redirige a `/users`                                       |
-| 7    | ✅ Happy | Login user exitoso                    | Redirige a `/profile`                                     |
-| 8    | ❌ Sad   | Submit con email vacío                | Muestra error debajo del campo email                      |
-| 9    | ❌ Sad   | Submit con email inválido             | Muestra error debajo del campo email                      |
-| 10   | ❌ Sad   | Submit con password vacía             | Muestra error debajo del campo password                   |
-| 11   | ❌ Sad   | API devuelve 401                      | Muestra mensaje de error general encima del botón         |
-| 12   | ❌ Sad   | API devuelve 403 (usuario inactivo)   | Muestra mensaje de error general encima del botón         |
+| 1    | ✅ Happy | Submit con credenciales válidas       | Llama a `POST /api/auth/login`, guarda sesión en store    |
+| 2    | ✅ Happy | Login admin exitoso                   | Redirige a `/users`                                       |
+| 3    | ✅ Happy | Login user exitoso                    | Redirige a `/profile`                                     |
+| 4    | ❌ Sad   | Submit con email vacío                | Muestra error debajo del campo email                      |
+| 5    | ❌ Sad   | Submit con email inválido             | Muestra error debajo del campo email                      |
+| 6    | ❌ Sad   | Submit con password vacío             | Muestra error debajo del campo password                   |
+| 7    | ❌ Sad   | API devuelve 401                      | Muestra mensaje de error general encima del botón         |
+| 8    | ❌ Sad   | API devuelve 403 (usuario inactivo)   | Muestra mensaje de error general encima del botón         |
 
-#### Modo Registro
+#### Modo Registro (7 tests)
 
 | Caso | Tipo     | Acción / Input                          | Resultado esperado                                     |
 | ---- | -------- | --------------------------------------- | ------------------------------------------------------ |
-| 13   | ✅ Happy | Submit con datos válidos                | Llama a `POST /api/auth/register`, luego hace login    |
-| 14   | ✅ Happy | Registro exitoso                        | Redirige según rol                                     |
-| 15   | ❌ Sad   | Password sin mayúscula                  | Muestra error debajo del campo password                |
-| 16   | ❌ Sad   | Password sin número                     | Muestra error debajo del campo password                |
-| 17   | ❌ Sad   | Password menor a 8 caracteres           | Muestra error debajo del campo password                |
-| 18   | ❌ Sad   | Confirmar password no coincide          | Muestra error debajo del campo confirmar password      |
-| 19   | ❌ Sad   | API devuelve 409 (email duplicado)      | Muestra `error.message` de la API encima del botón     |
+| 9    | ✅ Happy | Submit con datos válidos                | Llama a `POST /api/auth/register` y muestra éxito      |
+| 10   | ✅ Happy | Registro exitoso                        | Validación de flujo de navegación (Placeholder)        |
+| 11   | ❌ Sad   | Password menor a 8 caracteres           | Muestra error debajo del campo password                |
+| 12   | ❌ Sad   | Password sin mayúscula                  | Muestra error debajo del campo password                |
+| 13   | ❌ Sad   | Password sin número                     | Muestra error debajo del campo password                |
+| 14   | ❌ Sad   | Confirmar password no coincide          | Muestra error debajo del campo confirmar password      |
+| 15   | ❌ Sad   | API devuelve 409 (email duplicado)      | Muestra error de la API encima del botón               |
 
-#### Comportamiento compartido
+#### Comportamiento compartido (2 tests)
 
 | Caso | Tipo     | Acción                        | Resultado esperado                           |
 | ---- | -------- | ----------------------------- | -------------------------------------------- |
-| 20   | ✅ Happy | Click en toggle Login/Registro | Cambia el modo y resetea el formulario       |
-| 21   | ✅ Happy | Usuario ya logueado visita `/login` | Redirige automáticamente                |
+| 16   | ✅ Happy | Click en toggle Login/Registro | Cambia el modo y resetea el formulario       |
+| 17   | ✅ Happy | Usuario ya logueado visita `/login` | Redirige automáticamente vía Guard     |
+
+---
 
 ### 7.4 UsersPage
 
@@ -297,7 +299,7 @@ Se testean solo los flujos más críticos. Los casos borde ya están cubiertos e
 | Auth E2E           | —               | —                    | 7         | 7      |
 | Profile E2E        | —               | —                    | 4         | 4      |
 | Users E2E          | —               | —                    | 6         | 6      |
-| **Total**          | **13**          | **27**               | **17**    | **57** |
+| **Total**          | **18**          | **27**               | **17**    | **62** |
 
 ---
 
@@ -323,7 +325,7 @@ Se testean solo los flujos más críticos. Los casos borde ya están cubiertos e
 | ---- | ---------------------------------------------------------------------------------------------- | --------------------------------------------------- |
 | 1    | Instalar Vitest, React Testing Library, jsdom y msw. Configurar `vitest.config.js` y `.env.test` | `npm test` corre sin errores (0 tests)            |
 | 2    | Crear helpers `renderWithProviders.jsx` y `factories.js`                                       | Helpers importables sin errores                     |
-| 3    | Tests unitarios de validaciones (13 tests)                                                     | 13 tests pasan, commit                              |
+| 3    | Tests unitarios de validaciones (18 tests)                                                     | 18 tests pasan, commit                              |
 | 4    | Tests de componentes de `PrivateRoute` y `AdminRoute` (4 tests)                                | 4 tests pasan, commit                               |
 | 5    | Tests de componentes de `AuthPage` (17 tests)                                                  | 17 tests pasan, commit                              |
 | 6    | Tests de componentes de `UsersPage` (6 tests)                                                  | 6 tests pasan, commit                               |

@@ -1,7 +1,7 @@
 # Spec — Frontend: Administrador de Usuarios
 
-**Versión:** 1.4  
-**Fecha:** 2026-04-02  
+**Versión:** 1.5  
+**Fecha:** 2026-04-07  
 **Metodología:** Spec-Driven Development (SDD)  
 **Repositorio relacionado:** `user-management-api` (backend)
 
@@ -87,7 +87,7 @@ Pantalla única con dos modos: **Login** y **Registro**, que se alternan con un 
 
 **Comportamiento compartido:**
 
-- Si el usuario ya está autenticado y navega a `/login`, redirige automáticamente.
+- Si el usuario ya está autenticado y navega a `/login`, el Guard `PublicOnlyRoute` lo redirige automáticamente a la raíz `/`, donde el `RootRedirect` lo envía a su panel correspondiente (`/users` o `/profile`) según su rol.
 - Al cambiar entre modo Login y Registro, el formulario se resetea completamente.
 
 ---
@@ -196,11 +196,13 @@ El store de Zustand maneja la sesión del usuario. Es la única fuente de verdad
   token: String | null,
 
   // Acciones
-  setSession: (user, token) => void,  // login exitoso
+  setSession: (data, token) => void,  // login exitoso (data contiene el objeto usuario)
   clearSession: () => void,           // logout
-  updateUser: (user) => void          // después de editar perfil
+  updateUser: (data) => void          // después de editar perfil
 }
 ```
+
+**Nota sobre la API:** Todas las respuestas exitosas de autenticación (`/login`, `/register`, `/me`) devuelven el objeto del usuario dentro de la clave `data`, cumpliendo con el spec del backend v1.3.
 
 **Persistencia:** el token y el usuario se guardan en `localStorage` para sobrevivir recargas de página. Al iniciar la app, Zustand rehidrata el estado desde `localStorage`.
 
@@ -416,6 +418,7 @@ El proyecto se construye en fases. **No se avanza a la siguiente fase hasta que 
 
 - `feat:` — nueva pantalla o funcionalidad
 - `fix:` — corrección de bug
+- `refactor:` — mejoras internas de código (sin cambios funcionales)
 - `chore:` — configuración, dependencias, setup
 - `style:` — cambios de estilos sin impacto funcional
 - `docs:` — cambios en documentación
