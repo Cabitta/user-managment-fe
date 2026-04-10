@@ -289,7 +289,9 @@ Pruebas específicas creadas durante la **Fase 7** para cubrir la lógica utilit
 
 ## 8. Tests E2E — Flujos críticos
 
-Los tests E2E usan Playwright con un navegador real (Chromium). Requieren el backend corriendo en `localhost:3000` y el frontend en `localhost:5173`. No se mockea nada: la app se comporta exactamente como en producción.
+Los tests E2E usan Playwright con un navegador real (Chromium). Requieren arrancar el frontend en `localhost:5173` y **un proceso dedicado del backend en modo E2E** corriendo en `localhost:3001`. 
+
+> **Nota Arquitectónica**: El servidor de E2E del backend utilizará la base de datos `MongoMemoryServer` (la misma herramienta usada en tests de integración backend) para aislar por completo la ejecución y no mutar nuestra base de datos real de Atlas.
 
 Se testean solo los flujos más críticos. Los casos borde ya están cubiertos en los tests de componentes.
 
