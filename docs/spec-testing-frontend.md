@@ -1,7 +1,7 @@
 # Spec — Testing: Frontend
 
-**Versión:** 1.5
-**Fecha:** 2026-04-07
+**Versión:** 1.6
+**Fecha:** 2026-04-10
 **Metodología:** Spec-Driven Development (SDD)
 **Repositorio:** `user-management-client`
 **Referencia:** `docs/spec-frontend.md`
@@ -188,7 +188,16 @@ Los componentes se testean renderizándolos en un DOM simulado (jsdom). Las llam
 | 1    | ✅ Happy | Usuario con `role: 'admin'` | Renderiza el componente hijo    |
 | 2    | ❌ Sad   | Usuario con `role: 'user'`  | Redirige a `/profile`           |
 
-### 7.3 Componentes — AuthPage (17 tests)
+### 7.3 PublicOnlyRoute
+
+**Archivo:** `tests/components/PublicOnlyRoute.test.jsx`
+
+| Caso | Tipo     | Estado del store       | Resultado esperado                  |
+| ---- | -------- | ---------------------- | ----------------------------------- |
+| 1    | ✅ Happy | Sin sesión (null)      | Renderiza el componente hijo        |
+| 2    | ❌ Sad   | Usuario logueado       | Redirige a `/`                      |
+
+### 7.4 Componentes — AuthPage (17 tests)
 
 **Archivo:** `tests/components/AuthPage.test.jsx`
 
@@ -226,7 +235,7 @@ Los componentes se testean renderizándolos en un DOM simulado (jsdom). Las llam
 
 ---
 
-### 7.4 UsersPage (11 tests)
+### 7.5 UsersPage (11 tests)
 
 **Archivo:** `tests/components/UsersPage.test.jsx`
 
@@ -299,12 +308,13 @@ Se testean solo los flujos más críticos. Los casos borde ya están cubiertos e
 | Validaciones       | 18              | —                    | —         | 18     |
 | PrivateRoute       | —               | 2                    | —         | 2      |
 | AdminRoute         | —               | 2                    | —         | 2      |
+| PublicOnlyRoute    | —               | 2                    | —         | 2      |
 | AuthPage           | —               | 17                   | —         | 17     |
 | UsersPage          | —               | 11                   | —         | 11     |
 | Auth E2E           | —               | —                    | 7         | 7      |
 | Profile E2E        | —               | —                    | 4         | 4      |
 | Users E2E          | —               | —                    | 6         | 6      |
-| **Total**          | **18**          | **32**               | **17**    | **67** |
+| **Total**          | **18**          | **34**               | **17**    | **69** |
 
 ---
 
@@ -331,7 +341,7 @@ Se testean solo los flujos más críticos. Los casos borde ya están cubiertos e
 | 1    | Instalar Vitest, React Testing Library, jsdom y msw. Configurar `vitest.config.js` y `.env.test` | `npm test` corre sin errores (0 tests)            |
 | 2    | Crear helpers `renderWithProviders.jsx` y `factories.js`                                       | Helpers importables sin errores                     |
 | 3    | Tests unitarios de validaciones (18 tests)                                                     | 18 tests pasan, commit                              |
-| 4    | Tests de componentes de `PrivateRoute` y `AdminRoute` (4 tests)                                | 4 tests pasan, commit                               |
+| 4    | Tests de componentes de Guards (PrivateRoute, AdminRoute, PublicOnlyRoute - 6 tests)           | 6 tests pasan, commit                               |
 | 5    | Tests de componentes de `AuthPage` (17 tests)                                                  | 17 tests pasan, commit                              |
 | 6    | Tests de componentes de `UsersPage` (11 tests)                                                 | 11 tests pasan, commit                              |
 | 7    | Configurar coverage y verificar umbral del 80%                                                 | `npm run test:coverage` pasa sin errores, commit    |
