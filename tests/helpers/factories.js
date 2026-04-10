@@ -40,15 +40,18 @@ export const createAuthResponse = (overrides = {}) => ({
 /**
  * Simula una respuesta paginada de la lista de usuarios.
  */
-export const createPaginatedResponse = (users = [], overrides = {}) => ({
-  success: true,
-  data: users,
-  pagination: {
-    total: users.length,
-    page: 1,
-    limit: 10,
-    pages: 1,
-    ...overrides.pagination,
-  },
-  ...overrides,
-});
+export const createPaginatedResponse = (users = [], overrides = {}) => {
+  const { pagination = {}, ...restOverrides } = overrides;
+  return {
+    success: true,
+    data: users,
+    pagination: {
+      total: users.length,
+      page: 1,
+      limit: 10,
+      pages: 1,
+      ...pagination,
+    },
+    ...restOverrides,
+  };
+};

@@ -1,6 +1,6 @@
 # Spec — Testing: Frontend
 
-**Versión:** 1.6
+**Versión:** 1.7
 **Fecha:** 2026-04-10
 **Metodología:** Spec-Driven Development (SDD)
 **Repositorio:** `user-management-client`
@@ -36,12 +36,16 @@ user-management-client/
 ├── src/
 ├── tests/
 │   ├── unit/
-│   │   └── validation.test.js      # Tests de funciones de validación de formularios
+│   │   ├── validation.test.js      # Tests de funciones de validación de formularios
+│   │   ├── authStore.test.js       # Tests de estado de autenticación
+│   │   ├── api.test.js             # Tests de servicios API
+│   │   └── factories.test.js       # Tests de factories
 │   ├── components/
 │   │   ├── AuthPage.test.jsx
 │   │   ├── PrivateRoute.test.jsx
 │   │   ├── AdminRoute.test.jsx
-│   │   └── UsersPage.test.jsx
+│   │   ├── UsersPage.test.jsx
+│   │   └── ThemeToggle.test.jsx
 │   ├── e2e/
 │   │   ├── auth.spec.js            # Flujos de login y registro
 │   │   ├── profile.spec.js         # Flujos de perfil propio
@@ -239,6 +243,7 @@ Los componentes se testean renderizándolos en un DOM simulado (jsdom). Las llam
 
 **Archivo:** `tests/components/UsersPage.test.jsx`
 
+
 | Caso | Tipo     | Acción / Input                    | Resultado esperado                                    |
 | ---- | -------- | --------------------------------- | ----------------------------------------------------- |
 | 1    | ✅ Happy | Carga inicial                     | Llama a `GET /api/users?page=1&limit=10`, muestra tabla |
@@ -252,6 +257,33 @@ Los componentes se testean renderizándolos en un DOM simulado (jsdom). Las llam
 | 9    | ✅ Happy | Reset de página al buscar         | Al escribir nuevo término, vuelve a `page=1`          |
 | 10   | ✅ Happy | Diálogo de confirmación           | Se abre el modal con el nombre del usuario            |
 | 11   | ✅ Happy | Desactivación exitosa             | Cierra modal y refresca la lista tras `DELETE`        |
+
+---
+
+### 7.6 Shared & Core Logic (Coverage Suite)
+
+Pruebas específicas creadas durante la **Fase 7** para cubrir la lógica utilitaria y asegurar los umbrales de Code Coverage del proyecto (Functions/Branches > 80%).
+
+**Archivos:** `tests/components/ThemeToggle.test.jsx`, `tests/unit/*.js`
+
+#### ThemeToggle UI (1 test)
+| Caso | Tipo     | Acción / Input                    | Resultado esperado                                    |
+| ---- | -------- | --------------------------------- | ----------------------------------------------------- |
+| 1    | ✅ Happy | Click en el botón de theme        | Cambia la clase `dark` del document base en el DOM.   |
+
+#### AuthStore Management (3 tests)
+| Caso | Tipo     | Acción / Input                               | Resultado esperado                                       |
+| ---- | -------- | -------------------------------------------- | -------------------------------------------------------- |
+| 1    | ✅ Happy | Se llama a `authStore.setSession()`          | El estado se actualiza reteniendo las credenciales.      |
+| 2    | ✅ Happy | Se llama a `authStore.updateUser(parcial)`   | Combina asimétricamente el objeto con el perfil local.   |
+| 3    | ✅ Happy | Se llama a `authStore.clearSession()`        | Destruye referencias devolviendo estado vacío (null).    |
+
+#### API & Core Services (10 tests combinados)
+| Caso | Tipo     | Acción / Input                                     | Resultado esperado                                          |
+| ---- | -------- | -------------------------------------------------- | ----------------------------------------------------------- |
+| 1..4 | ✅ Happy | Se ejecutan métodos de `auth.api.js`               | Utilizan la instancia pura `axios` invocando su respectivo endpoint interno. |
+| 5..6 | ✅ Happy | Se ejecutan métodos de `users.api.js`              | El fetch mapea los parámetros adecuadamente limitándose a retornar `.data`. |
+| 7..10| ✅ Happy | Construcción de data vía helpers/factories         | Generan diccionarios para mocking integrando parámetros manuales (overrides) |
 
 ---
 
