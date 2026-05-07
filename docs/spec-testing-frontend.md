@@ -1,7 +1,7 @@
 # Spec — Testing: Frontend
 
-**Versión:** 1.7
-**Fecha:** 2026-04-10
+**Versión:** 1.8
+**Fecha:** 2026-05-06
 **Metodología:** Spec-Driven Development (SDD)
 **Repositorio:** `user-management-client`
 **Referencia:** `docs/spec-frontend.md`
@@ -328,10 +328,10 @@ Se testean solo los flujos más críticos. Los casos borde ya están cubiertos e
 | ---- | -------- | ----------------------------------------------- | ------------------------------------------------ |
 | 1    | ✅ Happy | Listar usuarios como admin                      | Tabla visible con paginación                     |
 | 2    | ✅ Happy | Buscar usuario por nombre                       | Tabla filtra resultados correctamente            |
-| 3    | ✅ Happy | Navegar al detalle de un usuario                | Muestra datos del usuario                        |
-| 4    | ✅ Happy | Editar nombre de un usuario                     | Nombre actualizado visible en modo Vista         |
-| 5    | ✅ Happy | Eliminar usuario (soft-delete)                  | Redirige a `/users`, usuario ya no aparece       |
-| 6    | ❌ Sad   | Intentar eliminar sin confirmar el modal        | Modal se cierra, usuario no se elimina           |
+| 3    | ✅ Happy | Navegar al detalle de un usuario                | Muestra el perfil del usuario seleccionado       |
+| 4    | ✅ Happy | Validación de estados y roles                   | Badges de ACTIVO/INACTIVO y ROL son correctos    |
+| 5    | ✅ Happy | Desactivar usuario (soft-delete)                | Redirige a `/users`, usuario marcado como INACTIVO |
+| 6    | ❌ Sad   | Cancelar desactivación en modal                 | Modal se cierra, usuario permanece igual         |
 
 ---
 
