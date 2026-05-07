@@ -19,7 +19,7 @@ export default defineConfig({
   
   use: {
     /* Base URL se utilizará en las acciones como `await page.goto('/')`. */
-    baseURL: 'http://localhost:5173',
+    baseURL: 'http://localhost:5174',
 
     /* Recolectar trace con cada fallo. */
     trace: 'on-first-retry',
@@ -43,10 +43,10 @@ export default defineConfig({
       timeout: 120 * 1000,
     },
     {
-      /* Arrancamos el frontend */
-      command: 'npm run dev',
-      url: 'http://localhost:5173',
-      reuseExistingServer: !process.env.CI,
+      /* Arrancamos un frontend paralelo aislado para escuchar al 3001 */
+      command: 'VITE_API_URL=http://localhost:3001/api npx vite --port 5174',
+      url: 'http://localhost:5174',
+      reuseExistingServer: false,
       timeout: 120 * 1000,
     }
   ],
